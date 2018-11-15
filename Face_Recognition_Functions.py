@@ -85,6 +85,22 @@ def learnOnNewFace(imgPath, nameOfPerson):
     # 4) Return a success state
     return 0
 
+"""
+TODO
+Function Name:
+    areTheySameFace
+Objective:
+    Compare two face's encodings and return a boolean determining if they are 
+    the same person.
+Input parameter(s): Both of type 'numpy.ndarray'
+    - encodingOne 
+    - encodingTwo
+Output parameter(s):
+    - Boolean 'True' if there is a match; else 'False'.
+"""
+def areTheySameFace(encodingOne, encodingTwo):
+    returnValue = face_recognition.compare_faces([encodingOne], encodingTwo)
+    return returnValue[0]
 
 """
 TODO
@@ -127,23 +143,26 @@ Output parameter(s):
 """
 
 if __name__ == "__main__":
-    imgPath = "Leo_Messi/1.jpg"
+    imgPath = "Leo_Messi/3.jpg"
     imgPath_CR7 = "Cristiano_Ronaldo/1.jpg"
     imgPath_GB = "Gareth_Bale/1.jpg"
 
     print("Register Messi: ", learnOnNewFace(imgPath, "Leonel Messi"))
     print("Register Cristiano: ", learnOnNewFace(imgPath_CR7, "Cristiano Ronaldo"))
     print("Register Gareth: ", learnOnNewFace(imgPath_GB, "Gareth Bale"))
+    
+    imgPath = "Gareth_Bale/3.jpg"
+    imgObject = face_recognition.load_image_file(imgPath)
+    faceEncoding = face_recognition.face_encodings(imgObject)[0]
 
     for key, value in knownPeople.items():
-        print(key, value, type(value))
+        if areTheySameFace(value, faceEncoding):
+            print(key)
 
-    # imgObject = face_recognition.load_image_file(imgPath)
     # imgObj_CR7 = face_recognition.load_image_file(imgPath_CR7)
     # imgObj_GB = face_recognition.load_image_file(imgPath_GB)
 
 
-    # faceEncoding = face_recognition.face_encodings(imgObject)[0]
     # faceEncoding_CR7 = face_recognition.face_encodings(imgObj_CR7)[0]
     # faceEncoding_GB = face_recognition.face_encodings(imgObj_GB)[0]
 
