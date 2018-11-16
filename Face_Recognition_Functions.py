@@ -1,4 +1,5 @@
 import face_recognition
+import cv2
 import numpy as np
 from PIL import Image
 import json
@@ -183,6 +184,22 @@ def printKnownPeople():
 """
     TODO
     Function Name:
+        whoAreThey
+    Objective:
+        Take a picture using OpenCV and check for known people on the image. The
+        algorithm will be a brut force comparison between the encodings from the
+        found faces and the encodings on people stored in 'knownPeople' dict.
+    Input parameter(s):
+        - foundFaces : A list of tuples of found face locations in css (top, right, bottom, left) order.
+    Output parameter(s):
+        - matches : list of names (strings) of the people found on the image
+"""
+# def whoAreThey(foundFaces):
+
+
+"""
+    TODO
+    Function Name:
         
     Objective:
 
@@ -196,11 +213,11 @@ if __name__ == "__main__":
 
     imgs = ["Leo_Messi/1.jpg", "Cristiano_Ronaldo/2.jpg", "Gareth_Bale/3.jpg","Leo_Messi/2.jpg"]
 
+    takePicRegistration("Sebastian Rivera")
+
     # print("Register Messi: ", learnOnNewFace(imgPath, "Leonel Messi"))
     # print("Register Cristiano: ", learnOnNewFace(imgPath_CR7, "Cristiano Ronaldo"))
     # print("Register Gareth: ", learnOnNewFace(imgPath_GB, "Gareth Bale"))
-    
-    # imgPath = "Gareth_Bale/3.jpg"
     
     # for imgPath in imgs:
     #     imgObject = face_recognition.load_image_file(imgPath)
@@ -212,16 +229,5 @@ if __name__ == "__main__":
     #         if areTheySameFace(newFaceEncoding, v):
     #             print(k)
 
-
-    # knownPeople["Gareth Bale"] = newFaceEncoding
-    # for key, value in knownPeople.items():
-    #     print(value, type(value))
-        # if areTheySameFace(value, faceEncoding):
-        #     print(key)
-
-    # with open("known_People.json", 'r') as read_file:
-    #     data = json.load(read_file)
-
-    # print("Data: ", data)
     # printKnownPeople()
     saveNewFaces()
