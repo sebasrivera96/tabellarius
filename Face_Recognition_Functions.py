@@ -8,6 +8,7 @@ import os
 # =========================== GLOBAL VARIABLES =============================== #
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
 JSONPath = "known_People.json"
+facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
 # ============================================================================= #
 
 # ============================= MAIN FUNTIONS ================================ #
@@ -107,9 +108,11 @@ def learnOnNewFace(imgPath, nameOfPerson):
         - Boolean 'True' if there is a match; else 'False'.
 """
 def areTheySameFace(encodingOne, encodingTwo):
-    # 1) Convert from type list to np.array
-    encodingOne = np.array(encodingOne)
-    encodingTwo = np.array(encodingTwo)
+    # 1) Convert from type list to np.array, if necessary
+    if type(encodingOne) != np.ndarray:
+        encodingOne = np.array(encodingOne)
+    if type(encodingTwo) != np.ndarray:
+        encodingTwo = np.array(encodingTwo)
 
     # 2) First parameter must be a list of np.array and second parameter must
     # be a single np.array
@@ -130,8 +133,13 @@ def areTheySameFace(encodingOne, encodingTwo):
 """
 def loadKnownFaces(jsonPath):
     global knownPeople
+    global facesLoaded
+
     with open("known_People.json", 'r') as read_file:
         knownPeople = json.load(read_file)  
+    facesLoaded = len(knownPeople)
+
+    print("\n===== Loaded knownPeople from JSON file correctly =====\n")
 
 """
     Function Name:
@@ -145,10 +153,14 @@ def loadKnownFaces(jsonPath):
 """
 def saveNewFaces():
     global knownPeople
-    with open("known_People.json", 'w') as write_file:
-        json.dump(knownPeople, write_file)
+    global facesLoaded
 
-    print("\n===== Saved knownPeople in JSON file =====\n")
+    # Check if elements were added/deleted during runtime
+    if facesLoaded != len(knownPeople):
+        with open("known_People.json", 'w') as write_file:
+            json.dump(knownPeople, write_file)
+
+        print("\n===== Saved knownPeople in JSON file correctly =====\n")
 
 """
     Function Name:
@@ -182,18 +194,23 @@ def printKnownPeople():
 if __name__ == "__main__":
     loadKnownFaces("known_People.json")
 
-    imgPath = "Leo_Messi/3.jpg"
-    imgPath_CR7 = "Cristiano_Ronaldo/1.jpg"
-    imgPath_GB = "Gareth_Bale/1.jpg"
+    imgs = ["Leo_Messi/1.jpg", "Cristiano_Ronaldo/2.jpg", "Gareth_Bale/3.jpg","Leo_Messi/2.jpg"]
 
-    print("Register Messi: ", learnOnNewFace(imgPath, "Leonel Messi"))
-    print("Register Cristiano: ", learnOnNewFace(imgPath_CR7, "Cristiano Ronaldo"))
-    print("Register Gareth: ", learnOnNewFace(imgPath_GB, "Gareth Bale"))
+    # print("Register Messi: ", learnOnNewFace(imgPath, "Leonel Messi"))
+    # print("Register Cristiano: ", learnOnNewFace(imgPath_CR7, "Cristiano Ronaldo"))
+    # print("Register Gareth: ", learnOnNewFace(imgPath_GB, "Gareth Bale"))
     
     # imgPath = "Gareth_Bale/3.jpg"
-    # imgObject = face_recognition.load_image_file(imgPath)
-    # faceEncoding = face_recognition.face_encodings(imgObject)
-    # newFaceEncoding = faceEncoding[0].tolist()
+    
+    # for imgPath in imgs:
+    #     imgObject = face_recognition.load_image_file(imgPath)
+    #     faceEncoding = face_recognition.face_encodings(imgObject)
+    #     # newFaceEncoding = faceEncoding[0].tolist()
+    #     newFaceEncoding = faceEncoding[0]
+    #     print(imgPath)
+    #     for k, v in knownPeople.items():
+    #         if areTheySameFace(newFaceEncoding, v):
+    #             print(k)
 
 
     # knownPeople["Gareth Bale"] = newFaceEncoding
@@ -206,5 +223,5 @@ if __name__ == "__main__":
     #     data = json.load(read_file)
 
     # print("Data: ", data)
-    printKnownPeople()
+    # printKnownPeople()
     saveNewFaces()
