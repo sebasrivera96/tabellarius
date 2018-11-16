@@ -4,7 +4,7 @@
 from Face_Recognition_Functions import *
 from OpenCV_Functions import *
 
-def registerNewPerson(newName)
+def registerNewPerson(newName):
     """
         TODO
         Function Name:
@@ -46,5 +46,7 @@ def registerNewPerson(newName)
 
 if __name__ == "__main__":
     loadKnownFaces("known_People.json")
-
+    printKnownPeople()
+    registerNewPerson("Sebastian Rivera")
+    printKnownPeople()
     saveNewFaces()
