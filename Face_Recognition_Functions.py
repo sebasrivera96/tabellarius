@@ -1,5 +1,8 @@
 # ====================== Face_Recognition_Functions.py ======================= #
-
+"""
+Documentation of the library face_recognition:
+    https://face-recognition.readthedocs.io/en/latest/face_recognition.html
+"""
 
 # =============================== LIBRARIES ================================== #
 import face_recognition
@@ -33,33 +36,26 @@ def facesOnImg(imgObj):
     faceLocations = face_recognition.face_locations(imgObj)
     return faceLocations
 
-def identifyKnownPeople(imgPath, facesEncodings):
+def isUnknownAKnownFace(unknownEncoding):
     """
         TODO
         Function Name:
-            identifyKnownPeople
+            isUnknownAKnownFace
         Objective:
-            Load an image with the face_recognition library and search for a known 
-            person using the encodings that were previously generated and stored.
+            Compare a new encoding with the ones stored in knownPeople dictionary
         Input parameter(s):
-            - imgPath : A relative path to the image. Preferably consider to have 
-                a local director to the repository to store the images.
-            - facesEncodings : TODO define wher this encodings will be stored, e.g.
-                on a txt file, on a directory created during the runtime.
+            - imgPath : unknownEndoing of data type <class numpy.ndarray>
         Return value(s):
-        - recognizedPeople : A list containig the names of the recognized people.
+            - String containing the name of the matching encoding, if any
     """
-    imgObj = face_recognition.load_image_file(imgPath)
-    recognizedPeople = []
+    matchingName = ""
 
-    # 1) Find the faces on the image
+    for tName, tEncoding in knownPeople.items():
+        if areTheySameFace(unknownEncoding, tEncoding):
+            matchingName = tName
+            break
 
-    # 2) Compare the found faces with the past encodings
-
-    # 3) Store the known people, if there is a match
-
-    # 4) Return the list with the names
-    return recognizedPeople
+    return matchingName
 
 def learnOnNewFace(imgPath, nameOfPerson):
     """
@@ -140,12 +136,13 @@ def loadKnownFaces(jsonPath):
     """
     global knownPeople
     global facesLoaded
+    print("\n===== Loading data from {} ... =====\n".format(jsonPath))
 
     with open("known_People.json", 'r') as read_file:
         knownPeople = json.load(read_file)  
     facesLoaded = len(knownPeople)
 
-    print("\n===== Loaded knownPeople from JSON file correctly =====\n")
+    print("\n===== Loaded from {} successful =====\n".format(jsonPath))
 
 def saveNewFaces():
     """
@@ -200,7 +197,6 @@ def printKnownPeople():
         Output parameter(s):
             - matches : list of names (strings) of the people found on the image
     """
-
 
 """
     TODO
