@@ -1,3 +1,7 @@
+# ====================== Face_Recognition_Functions.py ======================= #
+
+
+# =============================== LIBRARIES ================================== #
 import face_recognition
 import cv2
 import numpy as np
@@ -5,45 +9,46 @@ from PIL import Image
 import json
 import sys
 import os
+# ============================================================================ #
 
 # =========================== GLOBAL VARIABLES =============================== #
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
 JSONPath = "known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
-# ============================================================================= #
+# ============================================================================ #
 
 # ============================= MAIN FUNTIONS ================================ #
-"""
-    Function Name:
-        facesOnImg
-    Objective:
-        Return a list the of faces on the given image object.
-    Input parameter(s):
-        - imgObj: An image object loaded from with the face_recognition.load_image_file function
-    Return value(s):
-        - faceLocations: A list of tuples of found face locations in css (top, right, bottom, left) order.
-"""
 def facesOnImg(imgObj):
+    """
+        Function Name:
+            facesOnImg
+        Objective:
+            Return a list the of faces on the given image object.
+        Input parameter(s):
+            - imgObj: An image object loaded from with the face_recognition.load_image_file function
+        Return value(s):
+            - faceLocations: A list of tuples of found face locations in css (top, right, bottom, left) order.
+    """
     # Use a built-in function from the library to detect faces
     faceLocations = face_recognition.face_locations(imgObj)
     return faceLocations
 
-"""
-    TODO
-    Function Name:
-        identifyKnownPeople
-    Objective:
-        Load an image with the face_recognition library and search for a known 
-        person using the encodings that were previously generated and stored.
-    Input parameter(s):
-        - imgPath : A relative path to the image. Preferably consider to have 
-            a local director to the repository to store the images.
-        - facesEncodings : TODO define wher this encodings will be stored, e.g.
-            on a txt file, on a directory created during the runtime.
-    Return value(s):
-    - recognizedPeople : A list containig the names of the recognized people.
-"""
 def identifyKnownPeople(imgPath, facesEncodings):
+    """
+        TODO
+        Function Name:
+            identifyKnownPeople
+        Objective:
+            Load an image with the face_recognition library and search for a known 
+            person using the encodings that were previously generated and stored.
+        Input parameter(s):
+            - imgPath : A relative path to the image. Preferably consider to have 
+                a local director to the repository to store the images.
+            - facesEncodings : TODO define wher this encodings will be stored, e.g.
+                on a txt file, on a directory created during the runtime.
+        Return value(s):
+        - recognizedPeople : A list containig the names of the recognized people.
+    """
     imgObj = face_recognition.load_image_file(imgPath)
     recognizedPeople = []
 
@@ -56,27 +61,27 @@ def identifyKnownPeople(imgPath, facesEncodings):
     # 4) Return the list with the names
     return recognizedPeople
 
-"""
-    Function Name:
-        learnOnNewFace
-    Objective:
-        An image with a single face will be received to learn on a new face. If the
-        number of detected faces on the img is not 1, an error will be returned.
-    Input parameter(s):
-        - imgPath : A relative path to the image.
-        - nameOfPerson : A string that represents the name of the new person.
-        - facesDict : Dictionary with key NAME : value FACE_ENCODING.
-    Return value(s): 
-        - successState : Integer value communicating success or failure
-            * 0 : The face was correctly learned OR nameOfPerson is already registered
-            * -1 : There was a problem and the new face WASN'T learned, e.g. the 
-            number of faces detected on the image were 0 or more than 1
-"""
 def learnOnNewFace(imgPath, nameOfPerson):
+    """
+        Function Name:
+            learnOnNewFace
+        Objective:
+            An image with a single face will be received to learn on a new face. If the
+            number of detected faces on the img is not 1, an error will be returned.
+        Input parameter(s):
+            - imgPath : A relative path to the image.
+            - nameOfPerson : A string that represents the name of the new person.
+            - facesDict : Dictionary with key NAME : value FACE_ENCODING.
+        Return value(s): 
+            - successState : Integer value communicating success or failure
+                * 0 : The face was correctly learned OR nameOfPerson is already registered
+                * -1 : There was a problem and the new face WASN'T learned, e.g. the 
+                number of faces detected on the image were 0 or more than 1
+    """
     global knownPeople
     # 0) If nameOfPerson already exists, exit func. returning 0
     if nameOfPerson in knownPeople.keys():
-        print("\n !!!!! Face already registered !!!!! \n")
+        print("\n ===== Face already registered! ===== \n")
         return 0
 
     # 1) Find faces on the image
@@ -96,19 +101,19 @@ def learnOnNewFace(imgPath, nameOfPerson):
     # 4) Return a success state
     return 0
 
-"""
-    Function Name:
-        areTheySameFace
-    Objective:
-        Compare two face's encodings and return a boolean determining if they are 
-        the same person.
-    Input parameter(s): Both lists, which must be processed before comparing
-        - encodingOne 
-        - encodingTwo
-    Output parameter(s):
-        - Boolean 'True' if there is a match; else 'False'.
-"""
 def areTheySameFace(encodingOne, encodingTwo):
+    """
+        Function Name:
+            areTheySameFace
+        Objective:
+            Compare two face's encodings and return a boolean determining if they are 
+            the same person.
+        Input parameter(s): Both lists, which must be processed before comparing
+            - encodingOne 
+            - encodingTwo
+        Output parameter(s):
+            - Boolean 'True' if there is a match; else 'False'.
+    """
     # 1) Convert from type list to np.array, if necessary
     if type(encodingOne) != np.ndarray:
         encodingOne = np.array(encodingOne)
@@ -122,17 +127,17 @@ def areTheySameFace(encodingOne, encodingTwo):
     # 3) returnValue is a one-element list, thus return element 0
     return(returnValue[0])
 
-"""
-    Function Name:
-        loadKnownFaces
-    Objective:
-        Load the dictonary that contains the information about the information from the already learned faces.
-    Input parameter(s):
-        - jsonPath : A string of the relative path to the JSON file.
-    Return value(s):
-        * None because the data is loaded in a global dictionary called knownPeople
-"""
 def loadKnownFaces(jsonPath):
+    """
+        Function Name:
+            loadKnownFaces
+        Objective:
+            Load the dictonary that contains the information about the information from the already learned faces.
+        Input parameter(s):
+            - jsonPath : A string of the relative path to the JSON file.
+        Return value(s):
+            * None because the data is loaded in a global dictionary called knownPeople
+    """
     global knownPeople
     global facesLoaded
 
@@ -142,17 +147,17 @@ def loadKnownFaces(jsonPath):
 
     print("\n===== Loaded knownPeople from JSON file correctly =====\n")
 
-"""
-    Function Name:
-        saveNewFaces
-    Objective:
-
-    Input parameter(s):
-        * None
-    Output parameter(s):
-        * None
-"""
 def saveNewFaces():
+    """
+        Function Name:
+            saveNewFaces
+        Objective:
+
+        Input parameter(s):
+            * None
+        Output parameter(s):
+            * None
+    """
     global knownPeople
     global facesLoaded
 
@@ -163,17 +168,17 @@ def saveNewFaces():
 
         print("\n===== Saved knownPeople in JSON file correctly =====\n")
 
-"""
-    Function Name:
-        printKnownPeople
-    Objective:
-        Print data stored on global dictionary 'knownPeople'.
-    Input parameter(s):
-        * None
-    Output parameter(s):
-        * None
-"""
 def printKnownPeople():
+    """
+        Function Name:
+            printKnownPeople
+        Objective:
+            Print data stored on global dictionary 'knownPeople'.
+        Input parameter(s):
+            * None
+        Output parameter(s):
+            * None
+    """
     global knownPeople
     print("\n")
     for k,v in knownPeople.items():
@@ -181,20 +186,20 @@ def printKnownPeople():
         print(k, "==>", v[0:2], " ... ", v[-2:])
     print("-------------------------------------------\n")
 
-"""
-    TODO
-    Function Name:
-        whoAreThey
-    Objective:
-        Take a picture using OpenCV and check for known people on the image. The
-        algorithm will be a brut force comparison between the encodings from the
-        found faces and the encodings on people stored in 'knownPeople' dict.
-    Input parameter(s):
-        - foundFaces : A list of tuples of found face locations in css (top, right, bottom, left) order.
-    Output parameter(s):
-        - matches : list of names (strings) of the people found on the image
-"""
 # def whoAreThey(foundFaces):
+    """
+        TODO
+        Function Name:
+            whoAreThey
+        Objective:
+            Take a picture using OpenCV and check for known people on the image. The
+            algorithm will be a brut force comparison between the encodings from the
+            found faces and the encodings on people stored in 'knownPeople' dict.
+        Input parameter(s):
+            - foundFaces : A list of tuples of found face locations in css (top, right, bottom, left) order.
+        Output parameter(s):
+            - matches : list of names (strings) of the people found on the image
+    """
 
 
 """
