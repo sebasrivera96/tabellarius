@@ -19,7 +19,7 @@ import time
 def takePic(pathToSavePic = "./temp.jpg", showImage = False):
 
     cap = cv2.VideoCapture(0)
-    time.sleep(0.1) # Prevents the image to be dark
+    time.sleep(1) # Prevents the image to be dark
     _, frame = cap.read()
     cv2.imwrite(pathToSavePic, frame)
 
@@ -28,6 +28,7 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False):
         cv2.waitKey(0)
     
     cap.release()
+    cv2.destroyAllWindows()
 
 """
     TODO
@@ -39,3 +40,6 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False):
 
     Output parameter(s):
 """
+
+if __name__ == "__main__":
+    takePic(showImage = True)
