@@ -38,16 +38,15 @@ def registerNewPerson(newName):
 
 def lookForKnownPeople(verbose = False, takeNewPic = True):
     """
-    TODO
-    Function Name:
-        lookForKnownPeople
-    Objective:
-        Take a pic & look for known people.
-    Input parameter(s):
-        - verbose : boolean to print or not information
-        - takeNewPic : boolean to take or no a new picture
-    Output parameter(s):
-        * None
+        Function Name:
+            lookForKnownPeople
+        Objective:
+            Take a pic & look for known people.
+        Input parameter(s):
+            - verbose : boolean to print or not information
+            - takeNewPic : boolean to take or no a new picture
+        Output parameter(s):
+            * None
     """ 
     global defaultLocation
     facesMatches = []
@@ -74,15 +73,36 @@ def lookForKnownPeople(verbose = False, takeNewPic = True):
             print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
     return facesMatches
 
+def interactiveMenu():
+    """
+        TODO
+        Function Name:
+            
+        Objective:
+
+        Input parameter(s):
+
+        Output parameter(s):
+        
+    """
+    option = ''
+    while option != 'e':
+        print("Please type a character to execute an action: \n")
+        print("\t- [r] ==> Register a new person")
+        print("\t- [l] ==> Take a picture and look for a known person")
+        print("\t- [d] ==> Look for a known person in pictures inside a directory")        
+        print("\t- [c] ==> Erase a person from the list of known people")        
+        print("\t- [e] ==> Exit")
 """
     TODO
     Function Name:
-        lookForKnownPeople
+        
     Objective:
-        Take a pic & look for known people within 
+
     Input parameter(s):
 
     Output parameter(s):
+
 """
 
 if __name__ == "__main__":
