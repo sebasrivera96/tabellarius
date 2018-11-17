@@ -5,7 +5,7 @@ from Face_Recognition_Functions import *
 from OpenCV_Functions import *
 
 # ============================ GLOBAL VARAIBLES ============================== #
-defaultLocation = "./Gareth&Cristiano.jpg"
+defaultLocation = "./temp.jpg"
 # ============================================================================ #
 
 def registerNewPerson(newName):
@@ -36,7 +36,7 @@ def registerNewPerson(newName):
     elif successStatus != 0:
         print("{} WAS NOT added due to an error :( \n".format(newName))
 
-def lookForKnownPeople(verbose = False):
+def lookForKnownPeople(verbose = False, takeNewPic = True):
     """
     TODO
     Function Name:
@@ -45,6 +45,7 @@ def lookForKnownPeople(verbose = False):
         Take a pic & look for known people.
     Input parameter(s):
         - verbose : boolean to print or not information
+        - takeNewPic : boolean to take or no a new picture
     Output parameter(s):
         * None
     """ 
@@ -52,7 +53,8 @@ def lookForKnownPeople(verbose = False):
     facesMatches = []
 
     # 1) Take a new pic and save it in default location
-    # takePic(pathToSavePic=defaultLocation)
+    if takeNewPic:
+        takePic(pathToSavePic=defaultLocation)
     imgObj = face_recognition.load_image_file(defaultLocation)
 
     # 2) Find the encoding(s) of the faces found on the image
@@ -68,7 +70,8 @@ def lookForKnownPeople(verbose = False):
     if verbose:
         for i in facesMatches:
             print("Face of {} found on this image {}.\n".format(i, defaultLocation[2:]))
-
+        if facesMatches == 0:
+            print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
     return facesMatches
 
 """
@@ -85,6 +88,6 @@ def lookForKnownPeople(verbose = False):
 if __name__ == "__main__":
     loadKnownFaces("known_People.json") # This function is essential to load previously generated data
     
-    lookForKnownPeople(True)
+    lookForKnownPeople(verbose=True, takeNewPic=True)
 
     saveNewFaces()
