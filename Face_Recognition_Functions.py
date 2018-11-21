@@ -16,7 +16,7 @@ import os
 
 # =========================== GLOBAL VARIABLES =============================== #
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
-JSONPath = "known_People.json"
+JSONPath = "/home/sebasrivera96/Documents/Github/tabellarius/known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
 # ============================================================================ #
 
@@ -138,7 +138,7 @@ def loadKnownFaces(jsonPath):
     global facesLoaded
     print("\n===== Loading data from {} ... =====\n".format(jsonPath))
 
-    with open("known_People.json", 'r') as read_file:
+    with open(JSONPath, 'r') as read_file:
         knownPeople = json.load(read_file)  
     facesLoaded = len(knownPeople)
 
@@ -160,7 +160,7 @@ def saveNewFaces():
 
     # Check if elements were added/deleted during runtime
     if facesLoaded != len(knownPeople):
-        with open("known_People.json", 'w') as write_file:
+        with open(JSONPath, 'w') as write_file:
             json.dump(knownPeople, write_file)
 
         print("\n===== Saved knownPeople in JSON file correctly =====\n")

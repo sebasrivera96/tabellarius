@@ -3,9 +3,12 @@
 
 from Face_Recognition_Functions import *
 from OpenCV_Functions import *
+import sys
+
 
 # ============================ GLOBAL VARAIBLES ============================== #
-defaultLocation = "./temp.jpg"
+defaultLocation = "/home/sebasrivera96/Documents/Github/tabellarius/temp.jpg"
+facesFilePath = "/home/sebasrivera96/Documents/Github/tabellarius/namesFaces.txt"
 # ============================================================================ #
 
 def registerNewPerson(newName):
@@ -121,9 +124,18 @@ def interactiveMenu():
 """
 
 if __name__ == "__main__":
-    loadKnownFaces("known_People.json") # This function is essential to load previously generated data
+    loadKnownFaces(JSONPath) # This function is essential to load previously generated data
     
     # lookForKnownPeople(verbose=True, takeNewPic=True)
-    interactiveMenu()
+    if len(sys.argv) == 1:
+        interactiveMenu()
+    elif len(sys.argv) > 1:
+        if sys.argv[1] == "learn":
+            registerNewPerson(sys.argv[2])
+        elif sys.argv[1] == "recognize":
+            foundFaces = lookForKnownPeople(verbose=True, takeNewPic=True)
+            file = open(facesFilePath, "w")
+            for face in foundFaces:
+                file.write(face+"\n")
 
     saveNewFaces()
