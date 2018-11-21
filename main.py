@@ -87,12 +87,27 @@ def interactiveMenu():
     """
     option = ''
     while option != 'e':
-        print("Please type a character to execute an action: \n")
+        print("Please type a CHARACTER to execute an action: \n")
         print("\t- [r] ==> Register a new person")
+        print("\t- [p} ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
         print("\t- [d] ==> Look for a known person in pictures inside a directory")        
         print("\t- [c] ==> Erase a person from the list of known people")        
         print("\t- [e] ==> Exit")
+
+        option = input()
+
+        if option == 'p':
+            printKnownPeople()
+        elif option == 'r':
+            newName = input("Enter the name (First Last): ")
+            registerNewPerson(newName)
+        elif option == 'l':
+            lookForKnownPeople(verbose=True, takeNewPic=True)
+        elif option == 'c':
+            eraseName = input("Enter the name to be erased: ")
+            eraseFace(eraseName)
+
 """
     TODO
     Function Name:
@@ -108,6 +123,7 @@ def interactiveMenu():
 if __name__ == "__main__":
     loadKnownFaces("known_People.json") # This function is essential to load previously generated data
     
-    lookForKnownPeople(verbose=True, takeNewPic=True)
+    # lookForKnownPeople(verbose=True, takeNewPic=True)
+    interactiveMenu()
 
     saveNewFaces()
