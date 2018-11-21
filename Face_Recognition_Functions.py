@@ -198,6 +198,19 @@ def printKnownPeople():
             - matches : list of names (strings) of the people found on the image
     """
 
+def eraseFace(eraseName):
+    """
+        TODO
+        Function Name:
+            eraseFace
+        Objective:
+            Erase an element from knownPeople dictionary
+        Input parameter(s):
+            - eraseName : string to erase a specific value.
+        Output parameter(s):
+            - Failure status -1, in case key value is not found
+    """
+    return knownPeople.pop(eraseName, -1)
 """
     TODO
     Function Name:
