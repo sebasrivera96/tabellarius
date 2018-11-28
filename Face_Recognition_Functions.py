@@ -16,7 +16,7 @@ import os
 
 # =========================== GLOBAL VARIABLES =============================== #
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
-JSONPath = "/home/sebasrivera96/Documents/Github/tabellarius/known_People.json"
+JSONPath = "/home/sebasrivera96/Documents/Dev/tabellarius/known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
 # ============================================================================ #
 

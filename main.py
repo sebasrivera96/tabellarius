@@ -3,12 +3,13 @@
 
 from Face_Recognition_Functions import *
 from OpenCV_Functions import *
+from Directory_and_File_Functions import *
 import sys
 
 
 # ============================ GLOBAL VARAIBLES ============================== #
-defaultLocation = "/home/sebasrivera96/Documents/Github/tabellarius/temp.jpg"
-facesFilePath = "/home/sebasrivera96/Documents/Github/tabellarius/namesFaces.txt"
+defaultLocation = "/home/sebasrivera96/Documents/Dev/tabellarius/temp.jpg"
+facesFilePath = "/home/sebasrivera96/Documents/Dev/tabellarius/namesFaces.txt"
 # ============================================================================ #
 
 def registerNewPerson(newName):
@@ -76,17 +77,40 @@ def lookForKnownPeople(verbose = False, takeNewPic = True):
             print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
     return facesMatches
 
+def lookForKnownPeopleInDir(path):
+    """
+    TODO
+    Function Name:
+        lookForKnownPeopleInDir
+    Objective:
+        Look in various images inside a specified directory (path) for known people.
+    Input parameter(s):
+        - path : string that contains the path which contains the imgs to analyze
+    Output parameter(s):
+        * None
+    """
+
+    # 1) Change directory to 'path', if valid
+    successStatus = isPathValid(path)
+
+    # 2) Print success status
+    if successStatus:
+        print("\n==== The path {} was analyzed successfuly =====\n".format(path))
+    else:
+        print("\n==== The path {} is not valid! =====\n".format(path))
+
+
 def interactiveMenu():
     """
-        TODO
         Function Name:
-            
+            interactiveMenu
         Objective:
-
+            As the name suggests, this function will display a menu for the user 
+            to interact with the functionalities of tabellarius.
         Input parameter(s):
-
+            * None
         Output parameter(s):
-        
+            * None
     """
     option = ''
     while option != 'e':
@@ -94,22 +118,29 @@ def interactiveMenu():
         print("\t- [r] ==> Register a new person")
         print("\t- [p} ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
-        print("\t- [d] ==> Look for a known person in pictures inside a directory")        
         print("\t- [c] ==> Erase a person from the list of known people")        
+        print("\t- [d] ==> Look for a known person in pictures inside a directory")        
         print("\t- [e] ==> Exit")
 
         option = input()
 
-        if option == 'p':
-            printKnownPeople()
-        elif option == 'r':
+        if option == 'r':
             newName = input("Enter the name (First Last): ")
             registerNewPerson(newName)
+        elif option == 'p':
+            printKnownPeople()
         elif option == 'l':
             lookForKnownPeople(verbose=True, takeNewPic=True)
         elif option == 'c':
             eraseName = input("Enter the name to be erased: ")
             eraseFace(eraseName)
+        elif option == 'd':
+            directoryPath = input("Enter the directory where the pictures are located: ")
+            lookForKnownPeopleInDir(directoryPath)
+        elif option == 'e':
+            print("Exiting ...")
+        else:
+            print("The character [" + option + "] is not a valid option in this menu.")
 
 """
     TODO
