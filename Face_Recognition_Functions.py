@@ -57,6 +57,10 @@ def isUnknownAKnownFace(unknownEncoding):
 
     return matchingName
 
+def isNameRegistered(nameToTest):
+    global knownPeople
+    return nameToTest in knownPeople.keys()
+
 def learnOnNewFace(imgPath, nameOfPerson):
     """
         Function Name:
@@ -75,8 +79,9 @@ def learnOnNewFace(imgPath, nameOfPerson):
                 number of faces detected on the image were 0 or more than 1
     """
     global knownPeople
+    
     # 0) If nameOfPerson already exists, exit func. returning 0
-    if nameOfPerson in knownPeople.keys():
+    if isNameRegistered(nameOfPerson):
         print("\n ===== Face already registered! ===== \n")
         return 0
 
