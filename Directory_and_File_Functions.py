@@ -3,35 +3,23 @@
 from Face_Recognition_Functions import *
 import os
 
-
-def isPathValid(pathToTest):
+def isFileAnImg(fileName):
     """
+    TODO
     Function Name:
-        isPathValid
+        isFileAnImg
     Objective:
-        Check is the path is valid by looking for it.
+        Validate if fileName is an img file
     Input parameter(s):
-        - pathToTest : String containing the path to a directory.
+        - fileName : str with the file's name
     Output parameter(s):
-        - isValid : The path will be valid until the opposite is demonstrated.
+        - True (file is an img) : False (file not an img) 
     """
-    isValid = True
-    try:
-        os.chdir(pathToTest)
-    except:
-        return not isValid
-
-
-    # If path is valid, continue
-    filesInPath = os.listdir()
-    peopleInImgs = {} # Dictionary to store those images which contain known people
-
-    print("Images in ==> {}\n".format(pathToTest))
-    for currentFile in filesInPath:
-        # If file is an image, look for knownPeople
-        print("- " + currentFile)
-
-    return isValid
+    imageTypes = ('.jpg','.png','.jpeg')
+    for e in imageTypes:
+        if fileName.endswith(e):
+            return True
+    return False
 
     """
     TODO
@@ -46,4 +34,4 @@ def isPathValid(pathToTest):
     """
 
 if __name__ == "__main__":
-    isPathValid("/home/sebasrivera96/Documents/Dev/tabellarius/")
+    pass

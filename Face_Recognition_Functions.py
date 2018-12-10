@@ -216,16 +216,17 @@ def eraseFace(eraseName):
             - Failure status -1, in case key value is not found
     """
     return knownPeople.pop(eraseName, -1)
-"""
-    TODO
-    Function Name:
-        
-    Objective:
 
-    Input parameter(s):
+    """
+        TODO
+        Function Name:
+            
+        Objective:
 
-    Output parameter(s):
-"""
+        Input parameter(s):
+
+        Output parameter(s):
+    """
 
 if __name__ == "__main__":
     loadKnownFaces("known_People.json")

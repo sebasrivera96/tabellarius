@@ -40,7 +40,7 @@ def registerNewPerson(newName):
     elif successStatus != 0:
         print("{} WAS NOT added due to an error :( \n".format(newName))
 
-def lookForKnownPeople(verbose = False, takeNewPic = True):
+def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
     """
         Function Name:
             lookForKnownPeople
@@ -57,8 +57,10 @@ def lookForKnownPeople(verbose = False, takeNewPic = True):
 
     # 1) Take a new pic and save it in default location
     if takeNewPic:
-        takePic(pathToSavePic=defaultLocation)
-    imgObj = face_recognition.load_image_file(defaultLocation)
+        pathOfImage = defaultLocation
+        takePic(pathToSavePic=pathOfImage)
+
+    imgObj = face_recognition.load_image_file(pathOfImage)
 
     # 2) Find the encoding(s) of the faces found on the image
     listOfEncodings = face_recognition.face_encodings(imgObj)
@@ -71,13 +73,15 @@ def lookForKnownPeople(verbose = False, takeNewPic = True):
     
     # 4) Print the matching names
     if verbose:
-        for i in facesMatches:
-            print("Face of {} found on this image {}.\n".format(i, defaultLocation[2:]))
         if facesMatches == 0:
             print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
+        else:
+            for i in facesMatches:
+                print("--> Face of {} found!".format(i))
+            print("")
     return facesMatches
 
-def lookForKnownPeopleInDir(path):
+def lookForKnownPeopleInDir():
     """
     TODO
     Function Name:
@@ -89,15 +93,35 @@ def lookForKnownPeopleInDir(path):
     Output parameter(s):
         * None
     """
+    
+    # --> Ask for a person to look for, then validate it
+    # nameToLook = ""
+    # while not isNameRegistered(nameToLook):
+    #     nameToLook = input("\nEnter the name of the person to look for: ")
 
-    # 1) Change directory to 'path', if valid
-    successStatus = isPathValid(path)
+    # --> Ask for a path. chdir to 'path', if valid
+    directoryPath = ""
+    while not os.path.exists(directoryPath):
+        directoryPath = input("\nEnter the directory where the pictures are located: ")
 
-    # 2) Print success status
-    if successStatus:
-        print("\n==== The path {} was analyzed successfuly =====\n".format(path))
-    else:
-        print("\n==== The path {} is not valid! =====\n".format(path))
+    # -->
+    os.chdir(directoryPath)
+    filesInPath = os.listdir()
+    foundImages = 0
+
+    print("***** Images in ==> {} *****\n".format(directoryPath))
+    for currentFile in filesInPath:
+        # If file is an image, look for knownPeople
+        if isFileAnImg(currentFile):
+            foundImages += 1
+            path2img = os.path.join(directoryPath,currentFile)
+            print("\n==============================================")
+            print("Looking for known faces in ==> " + str(currentFile) + "...")
+            lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2img)
+    print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
+
+    # --> Print success status
+    print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
 
 
 def interactiveMenu():
@@ -135,8 +159,7 @@ def interactiveMenu():
             eraseName = input("Enter the name to be erased: ")
             eraseFace(eraseName)
         elif option == 'd':
-            directoryPath = input("Enter the directory where the pictures are located: ")
-            lookForKnownPeopleInDir(directoryPath)
+            lookForKnownPeopleInDir()
         elif option == 'e':
             print("Exiting ...")
         else:
