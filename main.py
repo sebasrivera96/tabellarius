@@ -1,7 +1,6 @@
 # ================================= main.py ================================== #
 
-
-from Face_Recognition_Functions import *
+from tabellariusFunctions import *
 from OpenCV_Functions import *
 from Directory_and_File_Functions import *
 import sys
@@ -93,12 +92,6 @@ def lookForKnownPeopleInDir():
     Output parameter(s):
         * None
     """
-    
-    # --> Ask for a person to look for, then validate it
-    # nameToLook = ""
-    # while not isNameRegistered(nameToLook):
-    #     nameToLook = input("\nEnter the name of the person to look for: ")
-
     # --> Ask for a path. chdir to 'path', if valid
     directoryPath = ""
     while not os.path.exists(directoryPath):
@@ -117,12 +110,12 @@ def lookForKnownPeopleInDir():
             path2img = os.path.join(directoryPath,currentFile)
             print("\n==============================================")
             print("Looking for known faces in ==> " + str(currentFile) + "...")
-            lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2img)
+            facesMatched = lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2img)
+            theDB.updatePaths(facesMatched, pathOfImage)
     print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
 
     # --> Print success status
     print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
-
 
 def interactiveMenu():
     """
@@ -143,7 +136,7 @@ def interactiveMenu():
         print("\t- [p} ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
         print("\t- [c] ==> Erase a person from the list of known people")        
-        print("\t- [d] ==> Look for a known person in pictures inside a directory")        
+        print("\t- [d] ==> Look for known people in pictures of a given directory")        
         print("\t- [e] ==> Exit")
 
         option = input()

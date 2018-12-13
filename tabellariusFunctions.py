@@ -16,6 +16,7 @@ from PIL import Image
 import json
 import sys
 import os
+import time
 # ============================================================================ #
 
 # =========================== GLOBAL VARIABLES =============================== #
@@ -56,11 +57,17 @@ def isUnknownAKnownFace(unknownEncoding):
         Input parameter(s):
             - imgPath : unknownEndoing of data type <class numpy.ndarray>
         Return value(s):
-            - String containing the name of the matching encoding, if any
+            - String containing the name of the matching encoding, if any. Empty str returned when no match.
     """
+    global theDB
     matchingName = ""
 
-    for tName, tEncoding in knownPeople.items():
+    # for tName, tEncoding in knownPeople.items():
+    for tObject in theDB.values():
+        # Extract information from the TabellariusPerson obj
+        tName = tObject.getName()
+        tEncoding = tObject.getEncodings()
+
         if areTheySameFace(unknownEncoding, tEncoding):
             matchingName = tName
             break
@@ -320,12 +327,90 @@ class RuntimeDB:
         for k, v in self.registeredPeople.items():
             print("{} ==> {}, {}".format(k,v.getEncodings(), v.getPaths()))
 
+    def updatePaths(self):
+        for name, tObj in self.registeredPeople.items():
+            self.dbHandle.child("People").child(name).update({"pathsToImgs" : tObj.getPaths()})
+
+    def updateRuntimePaths(self, facesMatched, path):
+        """
+        TODO
+        Function Name:
+            
+        Objective:
+
+        Input parameter(s):
+
+        Output parameter(s):
+        """
+        for nameOfFace in facesMatched:
+            self.registeredPeople[nameOfFace].addPath(path)
+
+    def updateEncoding(self, name, encoding):
+        self.dbHandle.child("People").child(name).update({"encodings" : encoding})
 # ============================================================================ #
 
 # ============================= OPENCV FUNCTIONS ============================= #
+def takePic(pathToSavePic = "./temp.jpg", showImage = False):
+    """
+        TODO
+        Function Name:
+            takePic
+        Objective:
+            Take a picture an store it on the local directory ==> "./temp.jpg"
+        Input parameter(s):
+            - pathToSavePic : relative path to save the pic that will be captured. 
+                * Default value = "./temp.jpg"
+            - showImage : boolean val that determines if the img will be shown or not.
+                * Default value = False
+        Output parameter(s):
 
+    """
+    # TODO try/catch when opening the camera
+    cap = cv2.VideoCapture(0)
+    time.sleep(1) # Prevents the image to be dark
+    _, frame = cap.read()
+    cv2.imwrite(pathToSavePic, frame)
+
+    if showImage:
+        cv2.imshow("New Picture", frame)
+        cv2.waitKey(0)
+    
+    cap.release()
+    cv2.destroyAllWindows()
 
 # ============================================================================ #
+
+# ======================== DIRECTORY & FILES FUNCTIONS ======================= #
+def isFileAnImg(fileName):
+    """
+    TODO
+    Function Name:
+        isFileAnImg
+    Objective:
+        Validate if fileName is an img file
+    Input parameter(s):
+        - fileName : str with the file's name
+    Output parameter(s):
+        - True (file is an img) : False (file not an img) 
+    """
+    imageTypes = ('.jpg','.png','.jpeg')
+    for e in imageTypes:
+        if fileName.endswith(e):
+            return True
+    return False
+
+# ============================================================================ #
+
+    """
+    TODO
+    Function Name:
+        
+    Objective:
+
+    Input parameter(s):
+
+    Output parameter(s):
+    """
 
 if __name__ == "__main__":
     # loadKnownFaces("known_People.json")
@@ -335,9 +420,9 @@ if __name__ == "__main__":
     # takePicRegistration("Sebastian Rivera")
 
     # saveNewFaces()
-
+    enc = [-0.12451215088367462, 0.1324130743741989, 0.016436217352747917, -0.05885402113199234, -0.2077673375606537, 0.08744069933891296, -0.08062275499105453, -0.027331694960594177, 0.10549729317426682, -0.04180077463388443, 0.2250259667634964, -0.049243710935115814, -0.2720992863178253, -0.024380424991250038, -0.07537446916103363, 0.15143989026546478, -0.11014050245285034, -0.058159492909908295, -0.10049812495708466, -0.2121541053056717, -0.03928423672914505, 0.06940678507089615, -0.016132911667227745, 0.05956858769059181, -0.1668822169303894, -0.23768137395381927, -0.0031539034098386765, -0.16372984647750854, 0.09612885117530823, -0.15594062209129333, -0.03863710165023804, 0.06346476078033447, -0.11029714345932007, -0.033698659390211105, 0.03575294464826584, 0.0020417198538780212, -0.02842068485915661, -0.12709519267082214, 0.22558936476707458, -0.07350572198629379, -0.0549318790435791, 0.013971186242997646, 0.1341504454612732, 0.24512538313865662, 0.11907759308815002, -0.00849852617830038, 0.04727025702595711, -0.07700493186712265, 0.19799953699111938, -0.19360136985778809, 0.14015409350395203, 0.1467822790145874, 0.11901912093162537, 0.09623400866985321, 0.03703257441520691, -0.18007759749889374, -0.02905355766415596, 0.2195032835006714, -0.21728718280792236, 0.08397090435028076, 0.05658569186925888, 0.027492068707942963, -0.1362631767988205, -0.1524336040019989, 0.19807250797748566, 0.20429719984531403, -0.1131497472524643, -0.18027709424495697, 0.15253660082817078, -0.15343277156352997, -0.04591187462210655, 0.0405857190489769, -0.1306769698858261, -0.12891371548175812, -0.1927756518125534, 0.12198351323604584, 0.276944100856781, 0.23721054196357727, -0.162721186876297, -0.007861684076488018, -0.02092725969851017, -0.05864158272743225, 0.0021281444933265448, 0.024826254695653915, -0.12459409236907959, -0.12413810193538666, 0.030235398560762405, 0.019553247839212418, 0.17502322793006897, 0.009146051481366158, -0.008737161755561829, 0.20757119357585907, 0.0891205221414566, -0.06979658454656601, -0.001283283345401287, 0.024261631071567535, -0.18123780190944672, -0.06716939806938171, -0.054231829941272736, 0.0013412954285740852, 0.0023893509060144424, -0.1214044913649559, 0.029713772237300873, 0.07594374567270279, -0.19027775526046753, 0.1861744374036789, -0.031743697822093964, -0.0038180220872163773, -0.006893208250403404, 0.025142189115285873, -0.055949628353118896, -0.018132342025637627, 0.20743416249752045, -0.19672170281410217, 0.20113429427146912, 0.0728132575750351, 0.10999970138072968, 0.18571922183036804, 0.10877353698015213, 0.12610620260238647, 0.045428402721881866, -0.0010007377713918686, -0.10267752408981323, -0.12744958698749542, 0.10754186660051346, -0.10538624972105026, 0.03396880254149437, 0.061288654804229736]
     # Test for loading data from Firebase DB
     theDB = RuntimeDB(config)
     theDB.loadData()
-    theDB.printRegisteredPeople()
-    
+    # theDB.printRegisteredPeople()
+    theDB.updateEncoding("Leonel Messi", enc)    

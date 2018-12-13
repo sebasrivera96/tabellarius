@@ -72,14 +72,12 @@ class RuntimeDB:
         This person is completly new and must be added to the firebaseDB
         """
         raise NotImplementedError
-        
+
     def printRegisteredPeople(self):
         for k, v in self.registeredPeople.items():
             print("{} ==> {}, {}".format(k,v.getEncodings(), v.getPaths()))
         
 
 if __name__ == "__main__":
-    theDB = RuntimeDB(config)
-    theDB.loadData()
-    theDB.printRegisteredPeople()
+
     
