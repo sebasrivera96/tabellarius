@@ -1,12 +1,16 @@
-# ====================== Face_Recognition_Functions.py ======================= #
+# ====================== tabellariusFunctions.py ======================= #
 """
-Documentation of the library face_recognition:
+- Author: Sebastian Rivera Gonzalez
+- Official Github from Pyrebase:
+    https://github.com/thisbejim/Pyrebase
+- Documentation of the library face_recognition:
     https://face-recognition.readthedocs.io/en/latest/face_recognition.html
 """
 
 # =============================== LIBRARIES ================================== #
 import face_recognition
 import cv2
+import pyrebase
 import numpy as np
 from PIL import Image
 import json
@@ -18,9 +22,16 @@ import os
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
 JSONPath = "/home/sebasrivera96/Documents/Dev/tabellarius/known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
+theDB = 0
+config = {  "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
+            "authDomain": "thefirstapp-80dcc.firebaseapp.com",
+            "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
+            "projectId": "thefirstapp-80dcc",
+            "storageBucket": "thefirstapp-80dcc.appspot.com",
+            "messagingSenderId": "601653648941"}
 # ============================================================================ #
 
-# ============================= MAIN FUNTIONS ================================ #
+# ========================= FACE RECOGNITION FUNTIONS ======================== #
 def facesOnImg(imgObj):
     """
         Function Name:
@@ -38,7 +49,6 @@ def facesOnImg(imgObj):
 
 def isUnknownAKnownFace(unknownEncoding):
     """
-        TODO
         Function Name:
             isUnknownAKnownFace
         Objective:
@@ -59,7 +69,7 @@ def isUnknownAKnownFace(unknownEncoding):
 
 def isNameRegistered(nameToTest):
     global knownPeople
-    return nameToTest in knownPeople.keys()
+    return nameToTest in knownPeople.keys() or nameToTest in theDB.keys()
 
 def learnOnNewFace(imgPath, nameOfPerson):
     """
@@ -91,13 +101,16 @@ def learnOnNewFace(imgPath, nameOfPerson):
 
     # 2) If not 1, return -1 : else, keep going
     if len(faceLocation) != 1:
-        return -1 # Error because when learning a new face there must be exactly one to prevent ambiguity
+        # Error because when learning a new face there must be exactly one to 
+        # prevent ambiguity
+        return -1 
 
     # 3) Store the new encoding (value) related to nameOfPerson (key)
     newEncoding = face_recognition.face_encodings(imgObj, faceLocation)[0]
 
     # 4) Convert numpy.ndarray ==> list
-    knownPeople[nameOfPerson] = newEncoding.tolist()
+    # knownPeople[nameOfPerson] = newEncoding.tolist()
+    theDB.createPerson(nameOfPerson, newEncoding.tolist)
 
     # 4) Return a success state
     return 0
@@ -228,26 +241,103 @@ def eraseFace(eraseName):
         Output parameter(s):
     """
 
-if __name__ == "__main__":
-    loadKnownFaces("known_People.json")
+# ============================================================================ #
 
-    imgs = ["Leo_Messi/1.jpg", "Cristiano_Ronaldo/2.jpg", "Gareth_Bale/3.jpg","Leo_Messi/2.jpg"]
+# ============================ PYREBASE FUNCTIONS ============================ #
+class TabellariusPerson:
 
-    takePicRegistration("Sebastian Rivera")
+    # ===== ATTRIBUTES ===== #
+    name = ""
+    faceEncodings = []
+    pathsToImgs = []
 
-    # print("Register Messi: ", learnOnNewFace(imgPath, "Leonel Messi"))
-    # print("Register Cristiano: ", learnOnNewFace(imgPath_CR7, "Cristiano Ronaldo"))
-    # print("Register Gareth: ", learnOnNewFace(imgPath_GB, "Gareth Bale"))
+    # ===== METHODS ===== #
+    def __init__(self, tName = "", tFaceEncodings = [], tPathsToimgs = []):
+        self.name = tName
+        self.faceEncodings = tFaceEncodings
+        self.pathsToImgs = tPathsToimgs
+
+    def getName(self):
+        return self.name
+
+    def setName(self, tName):
+        self.name = tName
     
-    # for imgPath in imgs:
-    #     imgObject = face_recognition.load_image_file(imgPath)
-    #     faceEncoding = face_recognition.face_encodings(imgObject)
-    #     # newFaceEncoding = faceEncoding[0].tolist()
-    #     newFaceEncoding = faceEncoding[0]
-    #     print(imgPath)
-    #     for k, v in knownPeople.items():
-    #         if areTheySameFace(newFaceEncoding, v):
-    #             print(k)
+    def getEncodings(self):
+        return self.faceEncodings
 
-    # printKnownPeople()
-    saveNewFaces()
+    def setEncodings(self, tFaceEncodings):
+        self.faceEncodings = tFaceEncodings
+
+    def getPaths(self):
+        return self.pathsToImgs        
+
+    def addPath(self, newPath):
+        self.pathsToImgs.append(newPath)
+
+    def orderPaths(self):
+        raise NotImplementedError
+
+class RuntimeDB:
+
+    # ===== ATTRIBUTES ===== #
+    firebaseHandle = ""
+    dbHandle = ""
+    registeredPeople = {}
+
+    # ===== METHODS ===== #
+    def __init__(self, config):
+        self.firebaseHandle = pyrebase.initialize_app(config)
+        self.dbHandle = self.firebaseHandle.database()
+    
+    def loadData(self):
+        firebasePeople = self.dbHandle.child("People").get()
+
+        for firebasePerson in firebasePeople.each():
+
+            name = firebasePerson.key()
+            encodings = firebasePerson.val()["encodings"]
+            paths = firebasePerson.val()["pathsToImgs"]
+
+            self.addPerson(name, encodings, paths)
+
+    def addPerson(self, name, faceEncodings=[], paths=[]):
+        """
+
+        """
+        newPerson = TabellariusPerson(name, faceEncodings, paths)
+        self.registeredPeople[name] = newPerson
+
+    def createPerson(self, name, faceEncodings, paths=[""]):
+        """
+        This person is completly new and must be added to the firebaseDB
+        """
+        self.addPerson(name, faceEncodings, paths)
+        data = {"encodings" : faceEncodings, "pathsToImgs" : paths}
+        self.dbHandle.child("People").child(name).set(data)
+        
+    def printRegisteredPeople(self):
+        for k, v in self.registeredPeople.items():
+            print("{} ==> {}, {}".format(k,v.getEncodings(), v.getPaths()))
+
+# ============================================================================ #
+
+# ============================= OPENCV FUNCTIONS ============================= #
+
+
+# ============================================================================ #
+
+if __name__ == "__main__":
+    # loadKnownFaces("known_People.json")
+
+    # imgs = ["Leo_Messi/1.jpg", "Cristiano_Ronaldo/2.jpg", "Gareth_Bale/3.jpg","Leo_Messi/2.jpg"]
+
+    # takePicRegistration("Sebastian Rivera")
+
+    # saveNewFaces()
+
+    # Test for loading data from Firebase DB
+    theDB = RuntimeDB(config)
+    theDB.loadData()
+    theDB.printRegisteredPeople()
+    
