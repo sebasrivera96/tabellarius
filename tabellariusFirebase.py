@@ -1,23 +1,12 @@
 import pyrebase
 
-config = {
-    "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
-    "authDomain": "thefirstapp-80dcc.firebaseapp.com",
-    "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
-    "projectId": "thefirstapp-80dcc",
-    "storageBucket": "thefirstapp-80dcc.appspot.com",
-    "messagingSenderId": "601653648941"
-}
-
-firebase = pyrebase.initialize_app(config)
-
-# DATABASE FUNCTIONS
-db = firebase.database()
-registeredPeople = db.child("People").get()
-
-for person in registeredPeople.each():
-    print(person.key())
-    print(person.val()["pathsToImgs"])
+# ===== GLOBAL VARIABLES ===== #
+config = {  "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
+            "authDomain": "thefirstapp-80dcc.firebaseapp.com",
+            "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
+            "projectId": "thefirstapp-80dcc",
+            "storageBucket": "thefirstapp-80dcc.appspot.com",
+            "messagingSenderId": "601653648941"}
 
 class TabellariusPerson:
     # ===== ATTRIBUTES ===== #
@@ -54,11 +43,43 @@ class TabellariusPerson:
 
 class RuntimeDB:
     # ===== ATTRIBUTES ===== #
+    firebaseHandle = ""
+    dbHandle = ""
     registeredPeople = {}
 
     # ===== METHODS ===== #
-    def __init__(self):
-        loadData()
+    def __init__(self, config):
+        self.firebaseHandle = pyrebase.initialize_app(config)
+        self.dbHandle = self.firebaseHandle.database()
     
+    def loadData(self):
+        firebasePeople = self.dbHandle.child("People").get()
+
+        for firebasePerson in firebasePeople.each():
+
+            name = firebasePerson.key()
+            encodings = firebasePerson.val()["encodings"]
+            paths = firebasePerson.val()["pathsToImgs"]
+
+            self.addPerson(name, encodings, paths)
+
     def addPerson(self, name, faceEncodings=[], paths=[]):
+        newPerson = TabellariusPerson(name, faceEncodings, paths)
+        self.registeredPeople[name] = newPerson
+
+    def createPerson(self,)
+        """
+        This person is completly new and must be added to the firebaseDB
+        """
         raise NotImplementedError
+        
+    def printRegisteredPeople(self):
+        for k, v in self.registeredPeople.items():
+            print("{} ==> {}, {}".format(k,v.getEncodings(), v.getPaths()))
+        
+
+if __name__ == "__main__":
+    theDB = RuntimeDB(config)
+    theDB.loadData()
+    theDB.printRegisteredPeople()
+    
