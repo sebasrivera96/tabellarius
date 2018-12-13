@@ -1,17 +1,15 @@
 # ================================= main.py ================================== #
 
+# ================================ LIBRARIES ================================= #
 from tabellariusFunctions import *
-from OpenCV_Functions import *
-from Directory_and_File_Functions import *
-import sys
-
+# ============================================================================ #
 
 # ============================ GLOBAL VARAIBLES ============================== #
-defaultLocation = "/home/sebasrivera96/Documents/Dev/tabellarius/temp.jpg"
+defaultLocation = "./imgs/Gareth&Messi.jpg"
 facesFilePath = "/home/sebasrivera96/Documents/Dev/tabellarius/namesFaces.txt"
 # ============================================================================ #
 
-def registerNewPerson(newName):
+def registerNewPerson(newName, takeNewPic = 'Y'):
     """
         Function Name:
             registerNewPerson
@@ -26,12 +24,16 @@ def registerNewPerson(newName):
 
     # 0) Print starting of the function
     print(" ===== Registering a new person ... ===== \n")
+    pathToImg = defaultLocation
 
     # 1) Take a picture and store it in locally ("./temp.jpg")
-    takePic(showImage=False)
+    if takeNewPic == 'Y':
+        takePic(showImage=False)
+        pathToImg = "./temp.jpg"
+
 
     # 2) Call learn on new face to store {newName : faceEncoding} 
-    successStatus = learnOnNewFace(defaultLocation, newName)
+    successStatus = learnOnNewFace(pathToImg, newName)
 
     # 3) Print output status
     if successStatus == 0:
@@ -56,8 +58,10 @@ def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
 
     # 1) Take a new pic and save it in default location
     if takeNewPic:
-        pathOfImage = defaultLocation
+        pathOfImage = "./temp.jpg"
         takePic(pathToSavePic=pathOfImage)
+    else:
+        pathOfImage = defaultLocation
 
     imgObj = face_recognition.load_image_file(pathOfImage)
 
@@ -129,28 +133,36 @@ def interactiveMenu():
         Output parameter(s):
             * None
     """
+    global theDB
     option = ''
     while option != 'e':
         print("Please type a CHARACTER to execute an action: \n")
         print("\t- [r] ==> Register a new person")
         print("\t- [p} ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
-        print("\t- [c] ==> Erase a person from the list of known people")        
+        # print("\t- [c] ==> Erase a person from the list of known people")        
         print("\t- [d] ==> Look for known people in pictures of a given directory")        
         print("\t- [e] ==> Exit")
 
         option = input()
 
         if option == 'r':
-            newName = input("Enter the name (First Last): ")
-            registerNewPerson(newName)
+            newName = input("Enter the complete name: ")
+            
+            takeNewPic = ""
+            while takeNewPic != 'Y' and takeNewPic != 'N':
+                takeNewPic = input("Take a new picture? [Y/N]? ")
+
+            registerNewPerson(newName, takeNewPic)
         elif option == 'p':
-            printKnownPeople()
+            # printKnownPeople()
+            theDB.printRegisteredPeople()
         elif option == 'l':
-            lookForKnownPeople(verbose=True, takeNewPic=True)
-        elif option == 'c':
-            eraseName = input("Enter the name to be erased: ")
-            eraseFace(eraseName)
+            lookForKnownPeople(verbose=True, takeNewPic=False)
+        # TODO update this function to the FirebaseDB
+        # elif option == 'c':
+        #     eraseName = input("Enter the name to be erased: ")
+        #     eraseFace(eraseName)
         elif option == 'd':
             lookForKnownPeopleInDir()
         elif option == 'e':
@@ -170,8 +182,7 @@ def interactiveMenu():
 
 """
 
-if __name__ == "__main__":
-    loadKnownFaces(JSONPath) # This function is essential to load previously generated data
+if __name__ == "__main__":  
     
     # lookForKnownPeople(verbose=True, takeNewPic=True)
     if len(sys.argv) == 1:
@@ -185,4 +196,4 @@ if __name__ == "__main__":
             for face in foundFaces:
                 file.write(face+"\n")
 
-    saveNewFaces()
+    theDB.updatePaths()
