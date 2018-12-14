@@ -149,16 +149,23 @@ def interactiveMenu():
         if option == 'r':
             newName = input("Enter the complete name: ")
             
-            takeNewPic = ""
-            while takeNewPic != 'Y' and takeNewPic != 'N':
-                takeNewPic = input("Take a new picture? [Y/N]? ")
+            newPic = ""
+            while newPic != 'Y' and newPic != 'N':
+                newPic = input("Take a new picture? [Y/N]? ")
 
-            registerNewPerson(newName, takeNewPic)
+            registerNewPerson(newName, takeNewPic=newPic)
+
         elif option == 'p':
             # printKnownPeople()
             theDB.printRegisteredPeople()
         elif option == 'l':
-            lookForKnownPeople(verbose=True, takeNewPic=False)
+            newPic = ""
+            while newPic != 'Y' and newPic != 'N':
+                newPic = input("Take a new picture? [Y/N)]? ")
+            if newPic == 'Y':
+                lookForKnownPeople(verbose=True, takeNewPic=True)
+            elif newPic == 'N':
+                lookForKnownPeople(verbose=True, takeNewPic=False)
         # TODO update this function to the FirebaseDB
         # elif option == 'c':
         #     eraseName = input("Enter the name to be erased: ")

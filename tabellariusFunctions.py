@@ -381,7 +381,7 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False):
     """
     # TODO try/catch when opening the camera
     cap = cv2.VideoCapture(0)
-    time.sleep(1) # Prevents the image to be dark
+    time.sleep(2) # Prevents the image to be dark
     _, frame = cap.read()
     cv2.imwrite(pathToSavePic, frame)
 
