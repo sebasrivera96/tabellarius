@@ -303,10 +303,11 @@ class RuntimeDB:
         for firebasePerson in firebasePeople.each():
 
             name = firebasePerson.key()
-            encodings = firebasePerson.val()["encodings"]
             try:
+                encodings = firebasePerson.val()["encodings"]
                 paths = firebasePerson.val()["pathsToImgs"]
             except:
+                encodings = []
                 paths = []
 
             self.addPerson(name, encodings, paths)
@@ -357,6 +358,12 @@ class RuntimeDB:
 
     def getKeys(self):
         return self.registeredPeople.keys()
+
+    def removePerson(self, nameToRemove):
+        # Remove from firebase
+        self.dbHandle.child("People").child(nameToRemove).remove()
+        # Remove from Runtime DB
+        self.registeredPeople.pop(nameToRemove)
 
 # ===== Initialization of the RuntimeDB ... ===== #
 theDB = RuntimeDB(config)
@@ -429,8 +436,10 @@ def isFileAnImg(fileName):
 if __name__ == "__main__":
 
     # # Test for loading data from Firebase DB
-    # theDB = RuntimeDB(config)
-    # theDB.loadData()
-    # # theDB.printRegisteredPeople()
+    theDB = RuntimeDB(config)
+    #theDB.removePerson("Laura Elena Gonzalez")
+    theDB.loadData()
+    print(theDB.getKeys())
+    # theDB.printRegisteredPeople()
     # theDB.updateEncoding("Leonel Messi", "koko")    
-    takePic(showImage=True)
+    # takePic(showImage=True)

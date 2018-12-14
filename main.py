@@ -141,7 +141,7 @@ def interactiveMenu():
         print("\t- [r] ==> Register a new person")
         print("\t- [p} ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
-        # print("\t- [c] ==> Erase a person from the list of known people")        
+        print("\t- [c] ==> Erase a person from the list of known people")        
         print("\t- [d] ==> Look for known people in pictures of a given directory")        
         print("\t- [e] ==> Exit")
 
@@ -168,10 +168,9 @@ def interactiveMenu():
                 lookForKnownPeople(verbose=True, takeNewPic=True)
             elif newPic == 'N':
                 lookForKnownPeople(verbose=True, takeNewPic=False)
-        # TODO update this function to the FirebaseDB
-        # elif option == 'c':
-        #     eraseName = input("Enter the name to be erased: ")
-        #     eraseFace(eraseName)
+        elif option == 'c':
+            eraseName = input("Enter the name to be erased: ")
+            theDB.removePerson(eraseName)
         elif option == 'd':
             lookForKnownPeopleInDir()
         elif option == 'e':
