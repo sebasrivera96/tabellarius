@@ -5,7 +5,7 @@ from tabellariusFunctions import *
 # ============================================================================ #
 
 # ============================ GLOBAL VARAIBLES ============================== #
-defaultLocation = "./imgs/Gareth&Messi.jpg"
+defaultLocation = "./Mony&Sebas_1.jpeg"
 facesFilePath = "/home/sebasrivera96/Documents/Dev/tabellarius/namesFaces.txt"
 # ============================================================================ #
 
@@ -61,7 +61,8 @@ def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
         pathOfImage = "./temp.jpg"
         takePic(pathToSavePic=pathOfImage)
     else:
-        pathOfImage = defaultLocation
+        # Don't modify the pathOfImage
+        pass
 
     imgObj = face_recognition.load_image_file(pathOfImage)
 
@@ -76,12 +77,11 @@ def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
     
     # 4) Print the matching names
     if verbose:
-        if facesMatches == 0:
+        if len(facesMatches) == 0:
             print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
         else:
             for i in facesMatches:
-                print("--> Face of {} found!".format(i))
-            print("")
+                print("--> Face of {} found!\n".format(i))
     return facesMatches
 
 def lookForKnownPeopleInDir():
@@ -115,7 +115,7 @@ def lookForKnownPeopleInDir():
             print("\n==============================================")
             print("Looking for known faces in ==> " + str(currentFile) + "...")
             facesMatched = lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2img)
-            theDB.updatePaths(facesMatched, pathOfImage)
+            theDB.updateRuntimePaths(facesMatched, path=path2img)
     print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
 
     # --> Print success status
@@ -137,6 +137,7 @@ def interactiveMenu():
     option = ''
     while option != 'e':
         print("Please type a CHARACTER to execute an action: \n")
+        print("\t- [a] ==> Take a picture and display it")
         print("\t- [r] ==> Register a new person")
         print("\t- [p} ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
@@ -146,7 +147,9 @@ def interactiveMenu():
 
         option = input()
 
-        if option == 'r':
+        if option == 'a':
+            takePic(showImage=True)
+        elif option == 'r':
             newName = input("Enter the complete name: ")
             
             newPic = ""
@@ -154,7 +157,6 @@ def interactiveMenu():
                 newPic = input("Take a new picture? [Y/N]? ")
 
             registerNewPerson(newName, takeNewPic=newPic)
-
         elif option == 'p':
             # printKnownPeople()
             theDB.printRegisteredPeople()

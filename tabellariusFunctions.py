@@ -381,7 +381,7 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False):
     """
     # TODO try/catch when opening the camera
     cap = cv2.VideoCapture(0)
-    time.sleep(2) # Prevents the image to be dark
+    time.sleep(0.5) # Prevents the image to be dark
     _, frame = cap.read()
     cv2.imwrite(pathToSavePic, frame)
 
@@ -428,8 +428,9 @@ def isFileAnImg(fileName):
 
 if __name__ == "__main__":
 
-    # Test for loading data from Firebase DB
-    theDB = RuntimeDB(config)
-    theDB.loadData()
-    # theDB.printRegisteredPeople()
-    theDB.updateEncoding("Leonel Messi", "koko")    
+    # # Test for loading data from Firebase DB
+    # theDB = RuntimeDB(config)
+    # theDB.loadData()
+    # # theDB.printRegisteredPeople()
+    # theDB.updateEncoding("Leonel Messi", "koko")    
+    takePic(showImage=True)
