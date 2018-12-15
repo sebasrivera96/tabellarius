@@ -280,7 +280,8 @@ class TabellariusPerson:
         return self.pathsToImgs        
 
     def addPath(self, newPath):
-        self.pathsToImgs.append(newPath)
+        if newPath not in self.pathsToImgs:
+            self.pathsToImgs.append(newPath)
 
     def orderPaths(self):
         raise NotImplementedError
@@ -303,11 +304,11 @@ class RuntimeDB:
         for firebasePerson in firebasePeople.each():
 
             name = firebasePerson.key()
+            encodings = firebasePerson.val()["encodings"]
+
             try:
-                encodings = firebasePerson.val()["encodings"]
                 paths = firebasePerson.val()["pathsToImgs"]
             except:
-                encodings = []
                 paths = []
 
             self.addPerson(name, encodings, paths)
@@ -324,7 +325,7 @@ class RuntimeDB:
         This person is completly new and must be added to the firebaseDB
         """
         self.addPerson(name, faceEncodings, paths)
-        print(faceEncodings)
+        # print(faceEncodings)
         data = {"encodings" : faceEncodings}
         self.dbHandle.child("People").child(name).set(data)
         
@@ -363,7 +364,10 @@ class RuntimeDB:
         # Remove from firebase
         self.dbHandle.child("People").child(nameToRemove).remove()
         # Remove from Runtime DB
-        self.registeredPeople.pop(nameToRemove)
+        try:
+            self.registeredPeople.pop(nameToRemove)
+        except:
+            print("\n{} wasn't previously registered. No action performed.\n".format(nameToRemove))
 
 # ===== Initialization of the RuntimeDB ... ===== #
 theDB = RuntimeDB(config)

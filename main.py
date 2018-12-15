@@ -5,7 +5,7 @@ from tabellariusFunctions import *
 # ============================================================================ #
 
 # ============================ GLOBAL VARAIBLES ============================== #
-defaultLocation = "./Mony&Sebas_1.jpeg"
+defaultLocation = "./imgs/Ronaldo_3.jpg"
 facesFilePath = "/home/sebasrivera96/Documents/Dev/tabellarius/namesFaces.txt"
 # ============================================================================ #
 
@@ -121,7 +121,7 @@ def lookForKnownPeopleInDir():
     # --> Print success status
     print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
 
-def interactiveMenu():
+def interactiveMenu(): 
     """
         Function Name:
             interactiveMenu
@@ -155,6 +155,7 @@ def interactiveMenu():
             newPic = ""
             while newPic != 'Y' and newPic != 'N':
                 newPic = input("Take a new picture? [Y/N]? ")
+                newPic = newPic.upper()
 
             registerNewPerson(newName, takeNewPic=newPic)
         elif option == 'p':
@@ -195,13 +196,8 @@ if __name__ == "__main__":
     # lookForKnownPeople(verbose=True, takeNewPic=True)
     if len(sys.argv) == 1:
         interactiveMenu()
+    # if more arguments are given, execute a different action
     elif len(sys.argv) > 1:
-        if sys.argv[1] == "learn":
-            registerNewPerson(sys.argv[2])
-        elif sys.argv[1] == "recognize":
-            foundFaces = lookForKnownPeople(verbose=True, takeNewPic=True)
-            file = open(facesFilePath, "w")
-            for face in foundFaces:
-                file.write(face+"\n")
+        pass
 
     theDB.updatePaths()
