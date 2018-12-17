@@ -23,6 +23,7 @@ import time
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
 JSONPath = "/home/sebasrivera96/Documents/Dev/tabellarius/known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
+defaultLocation = "./imgs/Ronaldo_3.jpg"
 config = {  "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
             "authDomain": "thefirstapp-80dcc.firebaseapp.com",
             "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
@@ -100,8 +101,8 @@ def learnOnNewFace(imgPath, nameOfPerson):
     
     # 0) If nameOfPerson already exists, exit func. returning 0
     if isNameRegistered(nameOfPerson):
-        print("\n ===== Face already registered! ===== \n")
-        return 0
+        print("\n ===== Face from {} already registered! ===== \n".format(nameOfPerson))
+        return -1
 
     # 1) Find faces on the image
     imgObj = face_recognition.load_image_file(imgPath)
@@ -248,9 +249,146 @@ def eraseFace(eraseName):
         Output parameter(s):
     """
 
+def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
+    """
+        Function Name:
+            lookForKnownPeople
+        Objective:
+            Take a pic & look for known people.
+        Input parameter(s):
+            - verbose : boolean to print or not information
+            - takeNewPic : boolean to take or no a new picture
+        Output parameter(s):
+            * None
+    """ 
+    global defaultLocation
+    facesMatches = []
+
+    # 1) Take a new pic and save it in default location
+    if takeNewPic:
+        pathOfImage = "./temp.jpg"
+        takePic(pathToSavePic=pathOfImage)
+    else:
+        # Don't modify the pathOfImage
+        pass
+
+    imgObj = face_recognition.load_image_file(pathOfImage)
+
+    # 2) Find the encoding(s) of the faces found on the image
+    listOfEncodings = face_recognition.face_encodings(imgObj)
+
+    # 3) Iterate over listOfEncodings and look for mathces
+    for encoding in listOfEncodings:
+        tMatch = isUnknownAKnownFace(encoding)
+        if tMatch != "":
+            facesMatches.append(tMatch)
+    
+    # 4) Print the matching names
+    if verbose:
+        if len(facesMatches) == 0:
+            print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
+        else:
+            for i in facesMatches:
+                print("--> Face of {} found!\n".format(i))
+    return facesMatches
+
+def lookForKnownPeopleInDir():
+    """
+    TODO
+    Function Name:
+        lookForKnownPeopleInDir
+    Objective:
+        Look in various images inside a specified directory (path) for known people.
+    Input parameter(s):
+        - path : string that contains the path which contains the imgs to analyze
+    Output parameter(s):
+        * None
+    """
+    # --> Ask for a path. chdir to 'path', if valid
+    directoryPath = askForDirPath()
+
+    # --> Retrieve elements in directoryPath as a list
+    filesInPath = getFilesFromDir(directoryPath)
+    foundImages = 0
+
+    print("***** Images in ==> {} *****\n".format(directoryPath))
+    for currentFile in filesInPath:
+        # If file is an image, look for knownPeople
+        if isFileAnImg(currentFile):
+            foundImages += 1
+            path2img = os.path.join(directoryPath,currentFile)
+            print("\n==============================================")
+            print("Looking for known faces in ==> " + str(currentFile) + "...")
+            facesMatched = lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2img)
+            theDB.updateRuntimePaths(facesMatched, path=path2img)
+    print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
+
+    # --> Print success status
+    print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
+
 # ============================================================================ #
 
-# ============================ PYREBASE FUNCTIONS ============================ #
+# ========================== PYREBASE & DB FUNCTIONS ========================= #
+def registerNewPerson(newName, takeNewPic = 'Y'):
+    """
+        Function Name:
+            registerNewPerson
+        Objective:
+            Register a new person on the DB (known_People.json) with its corresponding face encoding.
+        Input parameter(s):
+            - newName : name of person to register
+        Output parameter(s):
+
+    """
+    global defaultLocation
+
+    # 0) Print starting of the function
+    print(" ===== Registering a new person ... ===== \n")
+    pathToImg = defaultLocation
+
+    # 1) Take a picture and store it in locally ("./temp.jpg")
+    if takeNewPic == 'Y':
+        takePic(showImage=False)
+        pathToImg = "./temp.jpg"
+
+
+    # 2) Call learn on new face to store {newName : faceEncoding} 
+    successStatus = learnOnNewFace(pathToImg, newName)
+
+    # 3) Print output status
+    if successStatus == 0:
+        print("{} was successfuly added to the DB \n".format(newName))
+    elif successStatus != 0:
+        print("{} WAS NOT added due to an error :( \n".format(newName))
+
+def registerPeopleFromDir():
+    """
+        Function Name:
+            registerPeopleFromDir
+        Objective:
+        Input parameter(s):
+        Output parameter(s):
+
+    """
+    directoryPath = askForDirPath()
+
+    filesInDirectoryPath = getFilesFromDir(directoryPath)
+
+    for currentFile in filesInDirectoryPath:
+        if isFileAnImg(currentFile):
+            # 1) Get the name of the person from the file name, e.g. FirstName_LastName.jpg
+            newName = getNameOfPerson(currentFile)
+
+            # 2) Call learn on new face to store
+            pathToImg = os.path.join(directoryPath,currentFile)
+            successStatus = learnOnNewFace(pathToImg, newName)
+
+            # 3) Print output status
+            if successStatus == 0:
+                print("{} was successfuly added to the DB \n".format(newName))
+            elif successStatus != 0:
+                print("{} WAS NOT added due to an error :( \n".format(newName))
+
 class TabellariusPerson:
 
     # ===== ATTRIBUTES ===== #
@@ -423,6 +561,47 @@ def isFileAnImg(fileName):
         if fileName.endswith(e):
             return True
     return False
+
+def getNameOfPerson(fileName):
+    nameOfPerson = ""
+    for char in fileName:
+        if char == '.':
+            return nameOfPerson
+        elif char == '_':
+            nameOfPerson += ' '
+        elif isALetter(char):
+            nameOfPerson += char
+
+def askForDirPath():
+    """
+        Function Name:
+        askForDirPath
+        Objective:
+        Input parameter(s):
+        Output parameter(s):
+
+    """
+    directoryPath = ""
+    while not os.path.exists(directoryPath):
+        directoryPath = input("\nEnter the directory where the pictures are located: ")
+
+    return directoryPath
+
+def getFilesFromDir(dir):
+    """
+        Function Name:
+            getFilesFromDir
+        Objective:
+        Input parameter(s):
+        Output parameter(s):
+
+    """
+    os.chdir(dir)
+    filesInDir = os.listdir()
+    return filesInDir
+
+def isALetter(c):
+    return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z')
 
 # ============================================================================ #
 
