@@ -191,6 +191,7 @@ def saveNewFaces():
 
         print("\n===== Saved knownPeople in JSON file correctly =====\n")
 
+# DEPRECATED
 def printKnownPeople():
     """
         Function Name:
@@ -209,6 +210,7 @@ def printKnownPeople():
         print(k, "==>", v[0:2], " ... ", v[-2:])
     print("-------------------------------------------\n")
 
+# DEPRECATED
 # def whoAreThey(foundFaces):
     """
         TODO
@@ -310,6 +312,8 @@ def lookForKnownPeopleInDir():
     # --> Retrieve elements in directoryPath as a list
     filesInPath = getFilesFromDir(directoryPath)
     foundImages = 0
+
+    print(filesInPath)
 
     print("***** Images in ==> {} *****\n".format(directoryPath))
     for currentFile in filesInPath:
@@ -469,7 +473,11 @@ class RuntimeDB:
         
     def printRegisteredPeople(self):
         for k, v in self.registeredPeople.items():
-            print("{} ==> {}..., {}".format(k,v.getEncodings()[0:3], v.getPaths()))
+            print("{} ==> {}...".format(k,v.getEncodings()[0:3]))
+            thePaths = v.getPaths()
+            for tPath in thePaths:
+                print("\t- {}".format(tPath))
+            print("\n")
 
     def updatePaths(self):
         for name, tObj in self.registeredPeople.items():
@@ -556,7 +564,7 @@ def isFileAnImg(fileName):
     Output parameter(s):
         - True (file is an img) : False (file not an img) 
     """
-    imageTypes = ('.jpg','.png','.jpeg')
+    imageTypes = ('.jpg','.png','.jpeg','.JPG')
     for e in imageTypes:
         if fileName.endswith(e):
             return True
@@ -618,11 +626,11 @@ def isALetter(c):
 
 if __name__ == "__main__":
 
-    # # Test for loading data from Firebase DB
-    theDB = RuntimeDB(config)
-    #theDB.removePerson("Laura Elena Gonzalez")
-    theDB.loadData()
-    print(theDB.getKeys())
-    # theDB.printRegisteredPeople()
-    # theDB.updateEncoding("Leonel Messi", "koko")    
-    # takePic(showImage=True)
+    # ===== Test for loading data from Firebase DB =====
+    # theDB = RuntimeDB(config)
+    # theDB.loadData()
+    # print(theDB.getKeys())
+
+    # ===== Other Tests =====
+    t = askForDirPath()
+    print(getFilesFromDir(t))
