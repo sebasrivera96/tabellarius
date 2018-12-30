@@ -313,7 +313,8 @@ def lookForKnownPeopleInDir():
     filesInPath = getFilesFromDir(directoryPath)
     foundImages = 0
 
-    print(filesInPath)
+    # print(filesInPath)
+    # TODO Resize the images to a reasonable WIDTH x HEIGHT
 
     print("***** Images in ==> {} *****\n".format(directoryPath))
     for currentFile in filesInPath:
@@ -554,6 +555,27 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 0):
     except:
         pass
 
+def resizePic(imageName = "./temp.jpg", newWidth = 640, newHeight = 480):
+    """
+        TODO
+        Function Name:
+            takePic
+        Objective:
+            Take a picture an store it on the local directory ==> "./temp.jpg"
+        Input parameter(s):
+            - pathToSavePic : relative path to save the pic that will be captured. 
+                * Default value = "./temp.jpg"
+            - showImage : boolean val that determines if the img will be shown or not.
+                * Default value = False
+        Output parameter(s):
+
+    """
+    img = cv2.imread(imageName)
+    print("\nOld shape ==> {}".format(img.shape))
+
+    img = cv2.resize(img,(newWidth, newHeight), interpolation = cv2.INTER_CUBIC)
+    print("\nNew shape ==> {}".format(img.shape))
+
 
 # ============================================================================ #
 
@@ -644,4 +666,7 @@ if __name__ == "__main__":
     # print(getFilesFromDir(t))
 
     # ===== Take Pic Test =====
-    takePic(showImage=True, deviceNum=0)
+    # takePic(showImage=True, deviceNum=0) 
+
+    # ===== Resize Image Test =====
+    resizePic(imageName="./Leo_Messi/Messi_1.jpg")
