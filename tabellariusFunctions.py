@@ -515,13 +515,14 @@ class RuntimeDB:
         except:
             print("\n{} wasn't previously registered. No action performed.\n".format(nameToRemove))
 
-# ===== Initialization of the RuntimeDB ... ===== #
-theDB = RuntimeDB(config)
-theDB.loadData()
+# ===== Initialization of the RuntimeDB, ONLY when called as a secondary script ... ===== #
+if __name__ != "__main__":
+    theDB = RuntimeDB(config)
+    theDB.loadData()
 # ============================================================================ #
 
 # ============================= OPENCV FUNCTIONS ============================= #
-def takePic(pathToSavePic = "./temp.jpg", showImage = False):
+def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 0):
     """
         TODO
         Function Name:
@@ -536,18 +537,23 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False):
         Output parameter(s):
 
     """
-    # TODO try/catch when opening the camera
-    cap = cv2.VideoCapture(0)
-    time.sleep(0.5) # Prevents the image to be dark
-    _, frame = cap.read()
-    cv2.imwrite(pathToSavePic, frame)
-
-    if showImage:
-        cv2.imshow("New Picture", frame)
-        cv2.waitKey(0)
     
-    cap.release()
-    cv2.destroyAllWindows()
+    try:
+        cap = cv2.VideoCapture(deviceNum)
+       
+        time.sleep(0.5) # Prevents the image to be dark
+        _, frame = cap.read()
+        cv2.imwrite(pathToSavePic, frame)
+
+        if showImage:
+            cv2.imshow("New Picture", frame)
+            cv2.waitKey(0)
+        
+        cap.release()
+        cv2.destroyAllWindows()
+    except:
+        pass
+
 
 # ============================================================================ #
 
@@ -608,7 +614,7 @@ def getFilesFromDir(dir):
     filesInDir = os.listdir()
     return filesInDir
 
-def isALetter(c):
+def isALetter(c): 
     return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z')
 
 # ============================================================================ #
@@ -629,8 +635,13 @@ if __name__ == "__main__":
     # ===== Test for loading data from Firebase DB =====
     # theDB = RuntimeDB(config)
     # theDB.loadData()
+    # theDB = RuntimeDB(config)
+    # theDB.loadData()
     # print(theDB.getKeys())
 
     # ===== Other Tests =====
-    t = askForDirPath()
-    print(getFilesFromDir(t))
+    # t = askForDirPath()
+    # print(getFilesFromDir(t))
+
+    # ===== Take Pic Test =====
+    takePic(showImage=True, deviceNum=0)
