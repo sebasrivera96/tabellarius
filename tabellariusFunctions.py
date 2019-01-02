@@ -23,7 +23,7 @@ import time
 knownPeople = {} # Dictionary: {key = Name, value = encoding}
 JSONPath = "/home/sebasrivera96/Documents/Dev/tabellarius/known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
-defaultLocation = "./imgs/Ronaldo_3.jpg"
+defaultLocation = "/home/sebasrivera96/Pictures/Renombradas/Aaron_Hernandez_RESIZED.jpg"
 config = {  "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
             "authDomain": "thefirstapp-80dcc.firebaseapp.com",
             "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
@@ -226,6 +226,7 @@ def printKnownPeople():
             - matches : list of names (strings) of the people found on the image
     """
 
+# DEPRECATED
 def eraseFace(eraseName):
     """
         TODO
@@ -350,12 +351,13 @@ def registerNewPerson(newName, takeNewPic = 'Y'):
 
     # 0) Print starting of the function
     print(" ===== Registering a new person ... ===== \n")
-    pathToImg = defaultLocation
 
     # 1) Take a picture and store it in locally ("./temp.jpg")
     if takeNewPic == 'Y':
         takePic(showImage=False)
         pathToImg = "./temp.jpg"
+    else:
+        pathToImg = input("\nEnter the path to the image with the new face... \n")
 
 
     # 2) Call learn on new face to store {newName : faceEncoding} 
@@ -514,6 +516,7 @@ class RuntimeDB:
         # Remove from Runtime DB
         try:
             self.registeredPeople.pop(nameToRemove)
+            print("\n{} was succesfully removed.\n".format(nameToRemove))
         except:
             print("\n{} wasn't previously registered. No action performed.\n".format(nameToRemove))
 
@@ -580,6 +583,27 @@ def resizePic(imageName = "temp.jpg", newWidth = 640, newHeight = 480, verbose=F
     if verbose:
         print("\nNew shape ==> {}".format(res.shape))
 
+def resizeImgsInDir():
+    """
+    TODO
+    Function Name:
+        resizeImgsInDir
+    Objective:
+        Look in various images inside a specified directory (path) for known people.
+    Input parameter(s):
+        - path : string that contains the path which contains the imgs to analyze
+    Output parameter(s):
+        * None
+    """
+    # --> Ask for a path. chdir to 'path', if valid
+    directoryPath = askForDirPath()
+
+    # --> Retrieve elements in directoryPath as a list
+    filesInPath = getFilesFromDir(directoryPath)
+    foundImages = 0
+
+    for currentFile in filesInPath:
+        resizePic(newWidth=720, imageName=currentFile, verbose=True)
 
 # ============================================================================ #
 
@@ -661,9 +685,9 @@ if __name__ == "__main__":
     # ===== Test for loading data from Firebase DB =====
     # theDB = RuntimeDB(config)
     # theDB.loadData()
-    # theDB = RuntimeDB(config)
-    # theDB.loadData()
-    # print(theDB.getKeys())
+    # theDB.printRegisteredPeople()
+
+
 
     # ===== Other Tests =====
     # t = askForDirPath()
@@ -673,4 +697,7 @@ if __name__ == "__main__":
     # takePic(showImage=True, deviceNum=0) 
 
     # ===== Resize Image Test =====
-    resizePic(verbose=True)
+    # resizePic(verbose=True)
+
+    # ===== Resize ALL Images on a Directory =====
+    resizeImgsInDir()
