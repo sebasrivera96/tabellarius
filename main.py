@@ -27,7 +27,7 @@ def interactiveMenu():
         print("\t- [a] ==> Take a picture and display it")
         print("\t- [r] ==> Register a new person")
         print("\t- [s] ==> Register people from a directory")
-        print("\t- [p} ==> Print the registered people")
+        print("\t- [p] ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
         print("\t- [c] ==> Erase a person from the list of known people")        
         print("\t- [d] ==> Look for known people in pictures of a given directory")        

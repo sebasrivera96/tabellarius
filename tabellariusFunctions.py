@@ -319,6 +319,7 @@ def lookForKnownPeopleInDir():
     print("***** Images in ==> {} *****\n".format(directoryPath))
     for currentFile in filesInPath:
         # If file is an image, look for knownPeople
+        # TODO Modify this for loop to optimize the resize function on the images
         if isFileAnImg(currentFile):
             foundImages += 1
             path2img = os.path.join(directoryPath,currentFile)
@@ -555,7 +556,7 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 0):
     except:
         pass
 
-def resizePic(imageName = "./temp.jpg", newWidth = 640, newHeight = 480):
+def resizePic(imageName = "temp.jpg", newWidth = 640, newHeight = 480, verbose=False):
     """
         TODO
         Function Name:
@@ -571,10 +572,13 @@ def resizePic(imageName = "./temp.jpg", newWidth = 640, newHeight = 480):
 
     """
     img = cv2.imread(imageName)
-    print("\nOld shape ==> {}".format(img.shape))
+    if verbose:
+        print("\nOld shape ==> {}".format(img.shape))
 
-    img = cv2.resize(img,(newWidth, newHeight), interpolation = cv2.INTER_CUBIC)
-    print("\nNew shape ==> {}".format(img.shape))
+    res = cv2.resize(img,(newWidth, newHeight), interpolation = cv2.INTER_CUBIC)
+    cv2.imwrite(imageName[:-4] + "_RESIZED.jpg",res)
+    if verbose:
+        print("\nNew shape ==> {}".format(res.shape))
 
 
 # ============================================================================ #
@@ -669,4 +673,4 @@ if __name__ == "__main__":
     # takePic(showImage=True, deviceNum=0) 
 
     # ===== Resize Image Test =====
-    resizePic(imageName="./Leo_Messi/Messi_1.jpg")
+    resizePic(verbose=True)
