@@ -375,7 +375,8 @@ def registerPeopleFromDir():
             registerPeopleFromDir
         Objective:
             Ask the user for a directory with images named after the format
-            FirstName_LastName.jpg and register them to the Firebase DB.
+            FirstName_LastName.jpg and register them to the Firebase DB. The
+            file that is going to be analyzed is the RESIZED one.
         Input parameter(s):
             * None
         Output parameter(s):
@@ -391,8 +392,9 @@ def registerPeopleFromDir():
             # 1) Get the name of the person from the file name, e.g. FirstName_LastName.jpg
             newName = getNameOfPerson(currentFile)
 
-            # 2) Call learn on new face to store
-            pathToImg = os.path.join(directoryPath,currentFile)
+            # 2) Call learnOnNewFace function on RESIZED image to store face encodings in DB
+            currentFileResized = buildResizeImgName(originalFilename=currentFile)
+            pathToImg = os.path.join(directoryPath, currentFileResized)
             successStatus = learnOnNewFace(pathToImg, newName)
 
             # 3) Print output status
@@ -682,6 +684,11 @@ def deleteResizedImages(dir="."):
     os.chdir(dir)
     os.system("rm *_RESIZED*")
 
+def buildResizeImgName(originalFilename, sufix="_RESIZED"):
+    dotIndex = originalFilename.find('.')
+    res = originalFilename[:dotIndex] + "_RESIZED" + originalFilename[dotIndex:]
+    return res
+
 # ============================================================================ #
 
     """
@@ -702,8 +709,6 @@ if __name__ == "__main__":
     # theDB.loadData()
     # theDB.printRegisteredPeople()
 
-
-
     # ===== Other Tests =====
     # t = askForDirPath()
     # print(getFilesFromDir(t))
@@ -715,6 +720,6 @@ if __name__ == "__main__":
     # resizePic(verbose=True)
 
     # ===== Resize ALL Images on a Directory, wait 3 seconds & delete the resized images =====
-    resizeImgsInDir()
-    time.sleep(3)
-    deleteResizedImages(dir="/home/sebasrivera96/Pictures/facesToRegister/Batch1")
+    # resizeImgsInDir()
+    # time.sleep(3)
+    # deleteResizedImages(dir="/home/sebasrivera96/Pictures/facesToRegister/Batch1")
