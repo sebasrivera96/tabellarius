@@ -374,8 +374,12 @@ def registerPeopleFromDir():
         Function Name:
             registerPeopleFromDir
         Objective:
+            Ask the user for a directory with images named after the format
+            FirstName_LastName.jpg and register them to the Firebase DB.
         Input parameter(s):
+            * None
         Output parameter(s):
+            * None
 
     """
     directoryPath = askForDirPath()
@@ -484,8 +488,12 @@ class RuntimeDB:
             print("\n")
 
     def updatePaths(self):
-        for name, tObj in self.registeredPeople.items():
-            self.dbHandle.child("People").child(name).update({"pathsToImgs" : tObj.getPaths()})
+        update = "Y"
+        update = input("\n ===== Update the paths in Firebase Database? [Y/n] ==== \n")
+
+        if update == "Y":
+            for name, tObj in self.registeredPeople.items():
+                self.dbHandle.child("People").child(name).update({"pathsToImgs" : tObj.getPaths()})
 
     def updateRuntimePaths(self, facesMatched, path):
         """
@@ -559,7 +567,7 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 0):
     except:
         pass
 
-def resizePic(imageName = "temp.jpg", newWidth = 640, newHeight = 480, verbose=False):
+def resizePic(imageName = "temp.jpg", newWidth = 720, newHeight = 480, verbose=False):
     """
         TODO
         Function Name:
@@ -585,13 +593,12 @@ def resizePic(imageName = "temp.jpg", newWidth = 640, newHeight = 480, verbose=F
 
 def resizeImgsInDir():
     """
-    TODO
     Function Name:
         resizeImgsInDir
     Objective:
-        Look in various images inside a specified directory (path) for known people.
+        Resize all imgs on a given directory.
     Input parameter(s):
-        - path : string that contains the path which contains the imgs to analyze
+        * None
     Output parameter(s):
         * None
     """
@@ -600,10 +607,11 @@ def resizeImgsInDir():
 
     # --> Retrieve elements in directoryPath as a list
     filesInPath = getFilesFromDir(directoryPath)
-    foundImages = 0
 
+    # --> Execute the resizePic function on each img file of the list filesInPath
     for currentFile in filesInPath:
-        resizePic(newWidth=720, imageName=currentFile, verbose=True)
+        if isFileAnImg(currentFile):
+            resizePic(imageName=currentFile, verbose=True)
 
 # ============================================================================ #
 
@@ -656,8 +664,11 @@ def getFilesFromDir(dir):
         Function Name:
             getFilesFromDir
         Objective:
+            Get files from a given directory
         Input parameter(s):
+            - dir : Path to a directory.
         Output parameter(s):
+            - filesInDir : All files of the directory stored in a LIST.
 
     """
     os.chdir(dir)
@@ -666,6 +677,10 @@ def getFilesFromDir(dir):
 
 def isALetter(c): 
     return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z')
+
+def deleteResizedImages(dir="."):
+    os.chdir(dir)
+    os.system("rm *_RESIZED*")
 
 # ============================================================================ #
 
@@ -699,5 +714,7 @@ if __name__ == "__main__":
     # ===== Resize Image Test =====
     # resizePic(verbose=True)
 
-    # ===== Resize ALL Images on a Directory =====
+    # ===== Resize ALL Images on a Directory, wait 3 seconds & delete the resized images =====
     resizeImgsInDir()
+    time.sleep(3)
+    deleteResizedImages(dir="/home/sebasrivera96/Pictures/facesToRegister/Batch1")
