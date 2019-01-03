@@ -386,6 +386,8 @@ def registerPeopleFromDir():
     directoryPath = askForDirPath()
 
     filesInDirectoryPath = getFilesFromDir(directoryPath)
+    
+    resizeImgsInDir(directoryPath)
 
     for currentFile in filesInDirectoryPath:
         if isFileAnImg(currentFile):
@@ -402,6 +404,8 @@ def registerPeopleFromDir():
                 print("{} was successfuly added to the DB \n".format(newName))
             elif successStatus != 0:
                 print("{} WAS NOT added due to an error :( \n".format(newName))
+
+    deleteResizedImages(directoryPath)
 
 class TabellariusPerson:
 
@@ -593,22 +597,22 @@ def resizePic(imageName = "temp.jpg", newWidth = 720, newHeight = 480, verbose=F
     if verbose:
         print("\nNew shape ==> {}".format(res.shape))
 
-def resizeImgsInDir():
+def resizeImgsInDir(dir="."):
     """
     Function Name:
         resizeImgsInDir
     Objective:
         Resize all imgs on a given directory.
     Input parameter(s):
-        * None
+        - directoryPath : 
     Output parameter(s):
         * None
     """
-    # --> Ask for a path. chdir to 'path', if valid
-    directoryPath = askForDirPath()
+    # --> Change to dir
+    os.chdir(dir)
 
-    # --> Retrieve elements in directoryPath as a list
-    filesInPath = getFilesFromDir(directoryPath)
+    # --> Retrieve elements in dir as a list
+    filesInPath = getFilesFromDir(dir)
 
     # --> Execute the resizePic function on each img file of the list filesInPath
     for currentFile in filesInPath:
@@ -723,3 +727,5 @@ if __name__ == "__main__":
     # resizeImgsInDir()
     # time.sleep(3)
     # deleteResizedImages(dir="/home/sebasrivera96/Pictures/facesToRegister/Batch1")
+
+    pass
