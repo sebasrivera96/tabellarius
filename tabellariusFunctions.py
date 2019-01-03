@@ -315,23 +315,32 @@ def lookForKnownPeopleInDir():
     foundImages = 0
 
     # print(filesInPath)
-    # TODO Resize the images to a reasonable WIDTH x HEIGHT
+    # Resize the images to a reasonable WIDTH x HEIGHT
+    resizeImgsInDir(directoryPath)
 
     print("***** Images in ==> {} *****\n".format(directoryPath))
     for currentFile in filesInPath:
+
         # If file is an image, look for knownPeople
-        # TODO Modify this for loop to optimize the resize function on the images
         if isFileAnImg(currentFile):
             foundImages += 1
-            path2img = os.path.join(directoryPath,currentFile)
+
+            path2Img = os.path.join(directoryPath,currentFile)
+            path2resizedImg = os.path.join(directoryPath, buildResizeImgName(originalFilename=currentFile))
+            
             print("\n==============================================")
             print("Looking for known faces in ==> " + str(currentFile) + "...")
-            facesMatched = lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2img)
-            theDB.updateRuntimePaths(facesMatched, path=path2img)
+
+            facesMatched = lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2resizedImg)
+            theDB.updateRuntimePaths(facesMatched, path=path2Img)
+
     print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
 
     # --> Print success status
     print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
+
+    # --> Delete resized duplicates
+    deleteResizedImages(directoryPath)
 
 # ============================================================================ #
 
@@ -405,6 +414,7 @@ def registerPeopleFromDir():
             elif successStatus != 0:
                 print("{} WAS NOT added due to an error :( \n".format(newName))
 
+    # --> Delete resized duplicates    
     deleteResizedImages(directoryPath)
 
 class TabellariusPerson:
