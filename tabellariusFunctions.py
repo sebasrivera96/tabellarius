@@ -40,7 +40,7 @@ def facesOnImg(imgObj):
         Objective:
             Return a list the of faces on the given image object.
         Input parameter(s):
-            - imgObj: An image object loaded from with the face_recognition.load_image_file function
+            - imgPath: A path to the image file.
         Return value(s):
             - faceLocations: A list of tuples of found face locations in css (top, right, bottom, left) order.
     """
@@ -60,25 +60,30 @@ def isUnknownAKnownFace(unknownEncoding):
             - String containing the name of the matching encoding, if any. Empty str returned when no match.
     """
     global theDB
-    matchingName = ""
 
     # for tName, tEncoding in knownPeople.items():
     for tObject in theDB.getValues():
+
         # Extract information from the TabellariusPerson obj
         tName = tObject.getName()
         tEncoding = tObject.getEncodings()
 
         if areTheySameFace(unknownEncoding, tEncoding):
-            matchingName = tName
-            break
+            return tName
 
-    return matchingName
+    # Return None if no match was found
+    return None
 
 def isNameRegistered(nameToTest):
-    # global knownPeople
-    # return nameToTest in knownPeople.keys() 
     global theDB
     return nameToTest in theDB.registeredPeople.keys()
+
+def isThereASingleFace(faceLocations):
+    return len(faceLocations) == 1
+
+def getEncSingleFace(imgObj, facesLocation):
+    encodingOfFace = face_recognition.face_encodings(imgObj, faceLocation)[0]
+    return encodingOfFace
 
 def learnOnNewFace(imgPath, nameOfPerson):
     """
@@ -99,29 +104,32 @@ def learnOnNewFace(imgPath, nameOfPerson):
     """
     global theDB
     
-    # 0) If nameOfPerson already exists, exit func. returning 0
+    # -> If nameOfPerson already exists, exit func. returning 0
     if isNameRegistered(nameOfPerson):
         print("\n ===== Face from {} already registered! ===== \n".format(nameOfPerson))
         return -1
 
-    # 1) Find faces on the image
+    # -> Create imgObj with face_recognition module
     imgObj = face_recognition.load_image_file(imgPath)
+
+    # -> Find faces on the image
     faceLocation = facesOnImg(imgObj)
 
-    # 2) If not 1, return -1 : else, keep going
-    if len(faceLocation) != 1:
-        # Error because when learning a new face there must be exactly one to prevent ambiguity
-        return -1 
+    # -> If just one face found, keep going
+    if isThereASingleFace(faceLocation):
+        # -> Store the new encoding (value) related to nameOfPerson (key)
+        newEncodingAsNumpyArray = getEncodingOfSingleFace(imgObj, faceLocation)
 
-    # 3) Store the new encoding (value) related to nameOfPerson (key)
-    newEncoding = face_recognition.face_encodings(imgObj, faceLocation)[0]
+        # -> Convert numpy.ndarray ==> list
+        newEncodingAsList = newEncodingAsNumpyArray.tolist()
+        theDB.createPerson(nameOfPerson, newEncodingAsList)
 
-    # 4) Convert numpy.ndarray ==> list
-    # knownPeople[nameOfPerson] = newEncoding.tolist()
-    theDB.createPerson(nameOfPerson, newEncoding.tolist())
+        # -> Return success state
+        return 0
 
-    # 4) Return a success state
-    return 0
+    else:
+        # -> Return failure state
+        return -1
 
 def areTheySameFace(encodingOne, encodingTwo):
     """
@@ -190,25 +198,6 @@ def saveNewFaces():
             json.dump(knownPeople, write_file)
 
         print("\n===== Saved knownPeople in JSON file correctly =====\n")
-
-# DEPRECATED
-def printKnownPeople():
-    """
-        Function Name:
-            printKnownPeople
-        Objective:
-            Print data stored on global dictionary 'knownPeople'.
-        Input parameter(s):
-            * None
-        Output parameter(s):
-            * None
-    """
-    global knownPeople
-    print("\n")
-    for k,v in knownPeople.items():
-        print("-------------------------------------------")
-        print(k, "==>", v[0:2], " ... ", v[-2:])
-    print("-------------------------------------------\n")
 
 # DEPRECATED
 # def whoAreThey(foundFaces):
