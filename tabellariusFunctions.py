@@ -131,6 +131,13 @@ def learnOnNewFace(imgPath, nameOfPerson):
         # -> Return failure state
         return -1
 
+def convertToNpArray(tEncoding):
+    # -> Convert from type list to np.array, IF necessary
+    if type(tEncoding) != np.ndarray:
+        return np.array(tEncoding)
+    else:
+        return tEncoding
+
 def areTheySameFace(encodingOne, encodingTwo):
     """
         Function Name:
@@ -144,102 +151,15 @@ def areTheySameFace(encodingOne, encodingTwo):
         Output parameter(s):
             - Boolean 'True' if there is a match; else 'False'.
     """
-    # 1) Convert from type list to np.array, if necessary
-    if type(encodingOne) != np.ndarray:
-        encodingOne = np.array(encodingOne)
-    if type(encodingTwo) != np.ndarray:
-        encodingTwo = np.array(encodingTwo)
+    # -> Ensure the data type of the encodings
+    encodingOne = convertToNpArray(encodingOne)
+    encodingTwo = convertToNpArray(encodingTwo)
 
-    # 2) First parameter must be a list of np.array and second parameter must
-    # be a single np.array
-    returnValue = face_recognition.compare_faces([encodingOne], encodingTwo)
+    # -> 1st param. must be a list of np.array and 2nd param must be a single np.array
+    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo)
     
     # 3) returnValue is a one-element list, thus return element 0
     return(returnValue[0])
-
-def loadKnownFaces(jsonPath):
-    """
-        Function Name:
-            loadKnownFaces
-        Objective:
-            Load the dictonary that contains the information about the information from the already learned faces.
-        Input parameter(s):
-            - jsonPath : A string of the relative path to the JSON file.
-        Return value(s):
-            * None because the data is loaded in a global dictionary called knownPeople
-    """
-    global knownPeople
-    global facesLoaded
-    print("\n===== Loading data from {} ... =====\n".format(jsonPath))
-
-    with open(JSONPath, 'r') as read_file:
-        knownPeople = json.load(read_file)  
-    facesLoaded = len(knownPeople)
-
-    print("\n===== Loaded from {} successful =====\n".format(jsonPath))
-
-def saveNewFaces():
-    """
-        Function Name:
-            saveNewFaces
-        Objective:
-
-        Input parameter(s):
-            * None
-        Output parameter(s):
-            * None
-    """
-    global knownPeople
-    global facesLoaded
-
-    # Check if elements were added/deleted during runtime
-    if facesLoaded != len(knownPeople):
-        with open(JSONPath, 'w') as write_file:
-            json.dump(knownPeople, write_file)
-
-        print("\n===== Saved knownPeople in JSON file correctly =====\n")
-
-# DEPRECATED
-# def whoAreThey(foundFaces):
-    """
-        TODO
-        Function Name:
-            whoAreThey
-        Objective:
-            Take a picture using OpenCV and check for known people on the image. The
-            algorithm will be a brut force comparison between the encodings from the
-            found faces and the encodings on people stored in 'knownPeople' dict.
-        Input parameter(s):
-            - foundFaces : A list of tuples of found face locations in css (top, right, bottom, left) order.
-        Output parameter(s):
-            - matches : list of names (strings) of the people found on the image
-    """
-
-# DEPRECATED
-def eraseFace(eraseName):
-    """
-        TODO
-        Function Name:
-            eraseFace
-        Objective:
-            Erase an element from knownPeople dictionary
-        Input parameter(s):
-            - eraseName : string to erase a specific value.
-        Output parameter(s):
-            - Failure status -1, in case key value is not found
-    """
-    return knownPeople.pop(eraseName, -1)
-
-    """
-        TODO
-        Function Name:
-            
-        Objective:
-
-        Input parameter(s):
-
-        Output parameter(s):
-    """
 
 def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
     """
