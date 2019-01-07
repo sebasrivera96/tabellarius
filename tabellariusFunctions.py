@@ -161,7 +161,48 @@ def areTheySameFace(encodingOne, encodingTwo):
     # 3) returnValue is a one-element list, thus return element 0
     return(returnValue[0])
 
-def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
+def getPathOfImgToLookOn(takeNewPic, pathOfImage):
+    if takeNewPic:
+        takePic(pathToSavePic=pathOfImage)
+        
+        # Modify pathOfImg to the new captured image
+        pathOfImage = "./temp.jpg"
+
+    else:
+        # Don't modify the pathOfImage
+        return pathOfImage
+
+def getAllEncodingsOnImg(imgPath):
+    imgObj = face_recognition.load_image_file(imgPath)
+
+    # -> Find the encoding(s) of the faces found on the image
+    listOfEncodings = face_recognition.face_encodings(imgObj)
+
+    return listOfEncodings
+
+def lookForKnownPeopleInFiles(listOfFiles, verbose=False):
+    foundImages = 0
+
+    for currentFile in filesInPath:
+        # lookForKnownPeopleInImage(currentFile)
+
+        # If file is an image, look for knownPeople
+        if isFileAnImg(currentFile):
+            foundImages += 1
+
+            path2Img = createPathToAFile(directoryPath,currentFile)
+            path2resizedImg = createPathToAFile(directoryPath, buildResizeImgName(originalFilename=currentFile))
+
+            if verbose:
+                print("\n==============================================")
+                print("Looking for known faces in ==> " + str(currentFile) + "...")
+
+            facesMatched = lookForKnownPeopleInImg(takeNewPic=False, pathOfImage=path2resizedImg, verbose=True)
+            theDB.updateRuntimePaths(facesMatched, path=path2Img)
+
+    return foundImages
+
+def lookForKnownPeopleInImg(takeNewPic = True, pathOfImage = "", verbose = False):
     """
         Function Name:
             lookForKnownPeople
@@ -176,84 +217,74 @@ def lookForKnownPeople(verbose = False, takeNewPic = True, pathOfImage = ""):
     global defaultLocation
     facesMatches = []
 
-    # 1) Take a new pic and save it in default location
-    if takeNewPic:
-        pathOfImage = "./temp.jpg"
-        takePic(pathToSavePic=pathOfImage)
-    else:
-        # Don't modify the pathOfImage
-        pass
+    # -> Take a new pic and save it in default location
+    pathOfImage = getPathOfImgToLookOn(takeNewPic, pathOfImage)
 
-    imgObj = face_recognition.load_image_file(pathOfImage)
+    # -> Get all encodings on the image
+    listOfEncodings = getAllEncodingsOnImg(pathOfImage)
 
-    # 2) Find the encoding(s) of the faces found on the image
-    listOfEncodings = face_recognition.face_encodings(imgObj)
-
-    # 3) Iterate over listOfEncodings and look for mathces
+    # -> Iterate over listOfEncodings and look for mathces
     for encoding in listOfEncodings:
         tMatch = isUnknownAKnownFace(encoding)
-        if tMatch != "":
+        if tMatch != None:
             facesMatches.append(tMatch)
     
-    # 4) Print the matching names
+    # -> Print the matching names
     if verbose:
-        if len(facesMatches) == 0:
-            print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
-        else:
-            for i in facesMatches:
-                print("--> Face of {} found!\n".format(i))
+        printMatchingFaces(facesMatches)
+
     return facesMatches
 
-def lookForKnownPeopleInDir():
+def lookForKnownPeopleInDir(verbose = False):
     """
-    TODO
-    Function Name:
-        lookForKnownPeopleInDir
-    Objective:
-        Look in various images inside a specified directory (path) for known people.
-    Input parameter(s):
-        - path : string that contains the path which contains the imgs to analyze
-    Output parameter(s):
-        * None
+        Function Name:
+            lookForKnownPeopleInDir
+        Objective:
+            Look in various images inside a specified directory (path) for known people.
+        Input parameter(s):
+            - path : string that contains the path which contains the imgs to analyze
+        Output parameter(s):
+            * None
     """
-    # --> Ask for a path. chdir to 'path', if valid
-    directoryPath = askForDirPath()
-
-    # --> Retrieve elements in directoryPath as a list
-    filesInPath = getFilesFromDir(directoryPath)
+    # Variables declaration
     foundImages = 0
 
-    # print(filesInPath)
-    # Resize the images to a reasonable WIDTH x HEIGHT
-    resizeImgsInDir(directoryPath)
+    # -> Ask for a path
+    directoryPath = askForDirPath()
 
-    print("***** Images in ==> {} *****\n".format(directoryPath))
-    for currentFile in filesInPath:
+    # -> Retrieve elements in directoryPath as a list
+    filesInPath = getFilesFromDir(directoryPath)
 
-        # If file is an image, look for knownPeople
-        if isFileAnImg(currentFile):
-            foundImages += 1
+    # -> Resize the images to a reasonable WIDTH x HEIGHT
+    resizeImgsInDir(filesInPath)
 
-            path2Img = os.path.join(directoryPath,currentFile)
-            path2resizedImg = os.path.join(directoryPath, buildResizeImgName(originalFilename=currentFile))
-            
-            print("\n==============================================")
-            print("Looking for known faces in ==> " + str(currentFile) + "...")
+    if verbose:
+        print("***** Images in ==> {} *****\n".format(directoryPath))
+    
+    # -> Look for known people in the images of the current directoryPath
+    foundImages = lookForKnownPeopleInFiles(filesInPath, verbose)
 
-            facesMatched = lookForKnownPeople(verbose=True, takeNewPic=False, pathOfImage=path2resizedImg)
-            theDB.updateRuntimePaths(facesMatched, path=path2Img)
-
-    print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
+    if verbose:
+        print("***** " + str(foundImages) + " IMAGES were analyzed. *****")
 
     # --> Print success status
-    print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
+    if verbose:
+        print("\n==== The path {} was analyzed successfuly =====\n".format(directoryPath))
 
-    # --> Delete resized duplicates
+    # -> Delete resized images, because they are duplicates
     deleteResizedImages(directoryPath)
+
+def printMatchingFaces(facesMatches):
+    if len(facesMatches) == 0:
+        print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
+    else:
+        for i in facesMatches:
+            print("--> Face of {} found!\n".format(i))
 
 # ============================================================================ #
 
 # ========================== PYREBASE & DB FUNCTIONS ========================= #
+# TODO Clean this function
 def registerNewPerson(newName, takeNewPic = 'Y'):
     """
         Function Name:
@@ -287,6 +318,7 @@ def registerNewPerson(newName, takeNewPic = 'Y'):
     elif successStatus != 0:
         print("{} WAS NOT added due to an error :( \n".format(newName))
 
+# TODO Clean this function
 def registerPeopleFromDir():
     """
         Function Name:
@@ -516,7 +548,7 @@ def resizePic(imageName = "temp.jpg", newWidth = 720, newHeight = 480, verbose=F
     if verbose:
         print("\nNew shape ==> {}".format(res.shape))
 
-def resizeImgsInDir(dir="."):
+def resizeImgsInDir(filesInPath):
     """
     Function Name:
         resizeImgsInDir
@@ -527,13 +559,7 @@ def resizeImgsInDir(dir="."):
     Output parameter(s):
         * None
     """
-    # --> Change to dir
-    os.chdir(dir)
-
-    # --> Retrieve elements in dir as a list
-    filesInPath = getFilesFromDir(dir)
-
-    # --> Execute the resizePic function on each img file of the list filesInPath
+    # -> Execute the resizePic function on each img file of the list filesInPath
     for currentFile in filesInPath:
         if isFileAnImg(currentFile):
             resizePic(imageName=currentFile, verbose=True)
@@ -596,8 +622,12 @@ def getFilesFromDir(dir):
             - filesInDir : All files of the directory stored in a LIST.
 
     """
+    # -> Change location to dir (cd dir)
     os.chdir(dir)
+    
+    # -> List all files from dir (ls ./)
     filesInDir = os.listdir()
+
     return filesInDir
 
 def isALetter(c): 
@@ -611,6 +641,9 @@ def buildResizeImgName(originalFilename, sufix="_RESIZED"):
     dotIndex = originalFilename.find('.')
     res = originalFilename[:dotIndex] + "_RESIZED" + originalFilename[dotIndex:]
     return res
+
+def createPathToAFile(basePath, fileName):
+    return os.path.join(basePath, fileName)
 
 # ============================================================================ #
 
