@@ -30,7 +30,8 @@ def interactiveMenu():
         print("\t- [p] ==> Print the registered people")
         print("\t- [l] ==> Take a picture and look for a known person")
         print("\t- [c] ==> Erase a person from the list of known people")        
-        print("\t- [d] ==> Look for known people in pictures of a given directory")        
+        print("\t- [d] ==> Look for known people in pictures of a given directory") 
+        print("\t- [b] ==> Clear ALL the paths to images on theDB")                
         print("\t- [e] ==> Exit")
 
         option = input()
@@ -64,8 +65,11 @@ def interactiveMenu():
             theDB.removePerson(eraseName)
         elif option == 'd':
             lookForKnownPeopleInDir()
+        elif option == 'b':
+            theDB.clearAllPathsToImgs()
         elif option == 'e':
             print("Exiting ...")
+
         else:
             print("The character [" + option + "] is not a valid option in this menu.")
 
