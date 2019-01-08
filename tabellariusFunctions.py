@@ -82,7 +82,7 @@ def isThereASingleFace(faceLocations):
     return len(faceLocations) == 1
 
 def getEncSingleFace(imgObj, facesLocation):
-    encodingOfFace = face_recognition.face_encodings(imgObj, faceLocation)[0]
+    encodingOfFace = face_recognition.face_encodings(imgObj, facesLocation)[0]
     return encodingOfFace
 
 def learnOnNewFace(imgPath, nameOfPerson):
@@ -118,7 +118,7 @@ def learnOnNewFace(imgPath, nameOfPerson):
     # -> If just one face found, keep going
     if isThereASingleFace(faceLocation):
         # -> Store the new encoding (value) related to nameOfPerson (key)
-        newEncodingAsNumpyArray = getEncodingOfSingleFace(imgObj, faceLocation)
+        newEncodingAsNumpyArray = getEncSingleFace(imgObj, faceLocation)
 
         # -> Convert numpy.ndarray ==> list
         newEncodingAsList = newEncodingAsNumpyArray.tolist()
@@ -332,7 +332,7 @@ def registerPeopleFromDir():
 
     filesInDirectoryPath = getFilesFromDir(directoryPath)
     
-    resizeImgsInDir(directoryPath)
+    resizeImgsInDir(filesInDirectoryPath)
 
     for currentFile in filesInDirectoryPath:
         if isFileAnImg(currentFile):
@@ -430,7 +430,6 @@ class RuntimeDB:
         This person is completly new and must be added to the firebaseDB
         """
         self.addPerson(name, faceEncodings, paths)
-        # print(faceEncodings)
         data = {"encodings" : faceEncodings}
         self.dbHandle.child("People").child(name).set(data)
         
