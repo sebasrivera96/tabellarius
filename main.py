@@ -8,6 +8,10 @@ from tabellariusFunctions import *
 facesFilePath = "/home/sebasrivera96/Documents/Dev/tabellarius/namesFaces.txt"
 # ============================================================================ #
 
+def confirmAction(option):
+    confirmation = input("\n === Are you sure you want to execute option {}? [Yes/No] ===\n".format(option))
+    return (confirmation == "Yes")
+
 def interactiveMenu(): 
     """
         Function Name:
@@ -24,21 +28,22 @@ def interactiveMenu():
     option = ''
     while option != 'e':
         print("Please type a CHARACTER to execute an action: \n")
-        print("\t- [a] ==> Take a picture and display it")
-        print("\t- [r] ==> Register a new person")
-        print("\t- [s] ==> Register people from a directory")
-        print("\t- [p] ==> Print the registered people")
-        print("\t- [l] ==> Take a picture and look for a known person")
-        print("\t- [c] ==> Erase a person from the list of known people")        
-        print("\t- [d] ==> Look for known people in pictures of a given directory") 
-        print("\t- [b] ==> Clear ALL the paths to images on theDB")                
-        print("\t- [e] ==> Exit")
+        # print("\t- [A] ==> Take a picture and display it")
+        # print("\t- [B] ==> Register a new person")
+        print("\t- [C] ==> Register people from a directory")
+        print("\t- [D] ==> Print the registered people")
+        # print("\t- [E] ==> Take a picture and look for a known person")
+        print("\t- [F] ==> Erase a person given his/her name")        
+        print("\t- [G] ==> Look for known people in pictures of a given directory") 
+        print("\t- [H] ==> Remove the paths to images of ALL the registered users")    
+        print("\t- [I] ==> Remove ALL people registered")            
+        print("\t- [exit] ==> Exit")
 
         option = input()
 
-        if option == 'a':
+        if option == 'A':
             takePic(showImage=True)
-        elif option == 'r':
+        elif option == 'B':
             newName = input("Enter the complete name: ")
             
             newPic = ""
@@ -47,12 +52,12 @@ def interactiveMenu():
                 newPic = newPic.upper()
 
             registerNewPerson(newName, takeNewPic=newPic)
-        elif option == 's':
+        elif option == 'C':
             registerPeopleFromDir()
-        elif option == 'p':
+        elif option == 'D':
             # printKnownPeople()
             theDB.printRegisteredPeople()
-        elif option == 'l':
+        elif option == 'E':
             newPic = ""
             while newPic != 'Y' and newPic != 'N':
                 newPic = input("Take a new picture? [Y/N)]? ")
@@ -60,14 +65,19 @@ def interactiveMenu():
                 lookForKnownPeople(verbose=True, takeNewPic=True)
             elif newPic == 'N':
                 lookForKnownPeople(verbose=True, takeNewPic=False)
-        elif option == 'c':
+        elif option == 'F':
             eraseName = input("Enter the name to be erased: ")
             theDB.removePerson(eraseName)
-        elif option == 'd':
+        elif option == 'G':
             lookForKnownPeopleInDir()
-        elif option == 'b':
+        elif option == 'H':
             theDB.clearAllPathsToImgs()
-        elif option == 'e':
+        elif option == 'I':
+            if confirmAction(option):
+                theDB.removeAllPeople()
+            else:
+                print("\n ===== Operation {} was cancelled =====\n".format(option))
+        elif option == 'exit':
             print("Exiting ...")
 
         else:
