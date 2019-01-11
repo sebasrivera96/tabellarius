@@ -280,6 +280,9 @@ def lookForKnownPeopleInFiles(listOfFiles, directoryPath, verbose=False):
             facesMatched = lookForKnownPeopleInImg(takeNewPic=False, pathOfImage=path2resizedImg, verbose=True)
             theDB.updateRuntimePaths(facesMatched, path=path2Img)
 
+            # Clear the list after analisis on a picture
+            facesMatched.clear()
+
     return foundImages
 
 def lookForKnownPeopleInDir(verbose = False):
