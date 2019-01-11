@@ -172,7 +172,7 @@ def getPathOfImgToLookOn(takeNewPic, pathOfImage):
         # Don't modify the pathOfImage
         return pathOfImage
 
-def getAllEncodingsAndLocationsOnImg(imgPath):
+def getAllEncodingsAndLocationsOnImg(imgPath, verbose=False):
     mapLocation2EncodingOfFaces = {}
     imgObj = face_recognition.load_image_file(imgPath)
 
@@ -180,9 +180,12 @@ def getAllEncodingsAndLocationsOnImg(imgPath):
     locationsOfFacesInImg = face_recognition.face_locations(imgObj)
 
     # -> Find the encodings of  found on the image
-    # listOfEncodings = face_recognition.face_encodings(imgObj)
     for singleLocation in locationsOfFacesInImg:
-        mapLocation2EncodingOfFaces[singleLocation] = face_recognition.face_encodings(imgObj,known_face_locations=singleLocation)
+        singleLocationAsList = [singleLocation]
+        mapLocation2EncodingOfFaces[singleLocation] = face_recognition.face_encodings(imgObj,known_face_locations=singleLocationAsList)[0]
+        
+        if verbose:
+            print("Location {} : Checksum of encodings {}".format(singleLocation, len(mapLocation2EncodingOfFaces[singleLocation])))
 
     return mapLocation2EncodingOfFaces
 
@@ -729,13 +732,16 @@ if __name__ == "__main__":
     # deleteResizedImages(dir="/home/sebasrivera96/Desktop/FaceRevognitionTest_1")
 
     # ===== Draw a bounding box and name on img =====
-    name = "Vicente Guerrero"
+    # name = "Vicente Guerrero"
 
-    imgObj = face_recognition.load_image_file("temp.jpg")
-    pil_image, draw = createDrawAndImageObjects("temp.jpg")
+    # imgObj = face_recognition.load_image_file("temp.jpg")
+    # pil_image, draw = createDrawAndImageObjects("temp.jpg")
 
-    location = face_recognition.face_locations(imgObj)[0]
-    drawBoundingBoxAndNameonImg(name, draw, location)
-    pil_image.show()
+    # location = face_recognition.face_locations(imgObj)[0]
+    # drawBoundingBoxAndNameonImg(name, draw, location)
+    # pil_image.show()
+
+    # ===== Get all locations & encodings of faces on an img =====
+    getAllEncodingsAndLocationsOnImg("temp.jpg", verbose=True)
 
     pass
