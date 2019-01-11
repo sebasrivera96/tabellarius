@@ -32,7 +32,7 @@ config = {  "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
             "messagingSenderId": "601653648941"}
 # ============================================================================ #
 
-# ========================= FACE RECOGNITION FUNTIONS ======================== #
+# ========================= FACE RECOGNITION FUNCTIONS ======================== #
 def facesOnImg(imgObj):
     """
         Function Name:
@@ -156,7 +156,7 @@ def areTheySameFace(encodingOne, encodingTwo):
     encodingTwo = convertToNpArray(encodingTwo)
 
     # -> 1st param. must be a list of np.array and 2nd param must be a single np.array
-    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.5)
+    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.55)
     
     # 3) boolSameFace is a one-element list, thus return element 0
     return(boolSameFace[0])
@@ -195,7 +195,6 @@ def printMatchingFacesAndShowImg(facesMatched, imagePIL, pathOfImage):
     else:
         for i in facesMatched:
             print("--> Face of {} found!\n".format(i))
-
         imagePIL.show(title=pathOfImage)
 
 def createDrawAndImageObjects(pathToImg):
@@ -427,6 +426,7 @@ class TabellariusPerson:
         self.pathsToImgs = newListOfPaths
 
     def addPath(self, newPath):
+        # Make sure that newPath hasn't been added previously
         if newPath not in self.pathsToImgs:
             self.pathsToImgs.append(newPath)
 
@@ -529,6 +529,7 @@ class RuntimeDB:
         except:
             print("\n{} wasn't previously registered. No action performed.\n".format(nameToRemove))
 
+# TODO Try/Catch this initialization
 # ===== Initialization of the RuntimeDB, ONLY when called as a secondary script ... ===== #
 if __name__ != "__main__":
     theDB = RuntimeDB(config)
@@ -568,23 +569,34 @@ def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 0):
     except:
         pass
 
-def resizePic(originalImageName = "temp.jpg", newWidth = 720, newHeight = 480, verbose=False):
+def computeNewDimensions(imgCV2Obj, stdWidth, stdHeight):
+    # Get imgCV2Obj Width and Height
+    origWidth, origHeight = imgCV2Obj.shape[:2]
+
+    # Divide the original dimensions by the standard ones to get the scales
+    widthScale = origWidth / stdWidth
+    heightScale = origHeight / stdHeight
+
+    # Return the new SCALED dimensions
+    newWidht = int(origWidth / widthScale)
+    newHeight = int(origHeight / heightScale)
+    return newWidht, newHeight
+
+def resizePic(originalImageName = "temp.jpg", stdWidth = 720, stdHeight = 480, verbose=False):
     """
         TODO
         Function Name:
-            takePic
         Objective:
-            Take a picture an store it on the local directory ==> "./temp.jpg"
         Input parameter(s):
-            - pathToSavePic : relative path to save the pic that will be captured. 
-                * Default value = "./temp.jpg"
-            - showImage : boolean val that determines if the img will be shown or not.
-                * Default value = False
         Output parameter(s):
 
     """
     originalImage = cv2.imread(originalImageName)
 
+    # -> Compute newWidth and newHeight using the parameters stdWidth and stdHeight
+    newWidth, newHeight = computeNewDimensions(originalImage, stdWidth, stdHeight)
+
+    # -> Resize img, create resized name and save it 
     resizedImage = cv2.resize(originalImage,(newWidth, newHeight), interpolation = cv2.INTER_CUBIC)
     resizedImageName = buildResizeImgName(originalImageName)
     cv2.imwrite(resizedImageName, resizedImage)
@@ -724,7 +736,7 @@ if __name__ == "__main__":
     # takePic(showImage=True, deviceNum=0) 
 
     # ===== Resize Image Test =====
-    # resizePic(verbose=True)
+    resizePic(verbose=True)
 
     # ===== Resize ALL Images on a Directory, wait 3 seconds & delete the resized images =====
     # tFiles = getFilesFromDir(dir="/home/sebasrivera96/Desktop/FaceRevognitionTest_1")
@@ -743,6 +755,6 @@ if __name__ == "__main__":
     # pil_image.show()
 
     # ===== Get all locations & encodings of faces on an img =====
-    getAllEncodingsAndLocationsOnImg("temp.jpg", verbose=True)
+    # getAllEncodingsAndLocationsOnImg("temp.jpg", verbose=True)
 
     pass
