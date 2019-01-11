@@ -156,7 +156,7 @@ def areTheySameFace(encodingOne, encodingTwo):
     encodingTwo = convertToNpArray(encodingTwo)
 
     # -> 1st param. must be a list of np.array and 2nd param must be a single np.array
-    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo)
+    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.5)
     
     # 3) boolSameFace is a one-element list, thus return element 0
     return(boolSameFace[0])
@@ -189,12 +189,14 @@ def getAllEncodingsAndLocationsOnImg(imgPath, verbose=False):
 
     return mapLocation2EncodingOfFaces
 
-def printMatchingFaces(facesMatched):
+def printMatchingFacesAndShowImg(facesMatched, imagePIL, pathOfImage):
     if len(facesMatched) == 0:
-        print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
+        print("No known faces found on this image.\n")
     else:
         for i in facesMatched:
             print("--> Face of {} found!\n".format(i))
+
+        imagePIL.show(title=pathOfImage)
 
 def createDrawAndImageObjects(pathToImg):
     originalImage = face_recognition.load_image_file(pathToImg)
@@ -254,8 +256,7 @@ def lookForKnownPeopleInImg(takeNewPic = True, pathOfImage = "", verbose = False
     
     # -> Print the matching names
     if verbose:
-        printMatchingFaces(facesMatched)
-        imagePIL.show(title=pathOfImage)
+        printMatchingFacesAndShowImg(facesMatched, imagePIL, pathOfImage)
 
     # -> Remove the drawing library from memory as per the Pillow docs
     del drawPIL
