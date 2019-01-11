@@ -529,6 +529,18 @@ class RuntimeDB:
         except:
             print("\n{} wasn't previously registered. No action performed.\n".format(nameToRemove))
 
+    def removeAllPeople(self):
+        # Get all names
+        allNames = self.getKeys()
+
+        # Convert form dict_keys to a normal python list
+        allNamesAsList = [name for name in allNames]
+
+        # Loop over this list and call removePerson func for each element
+        for name in allNamesAsList:
+            self.removePerson(name)
+
+
 # TODO Try/Catch this initialization
 # ===== Initialization of the RuntimeDB, ONLY when called as a secondary script ... ===== #
 if __name__ != "__main__":
