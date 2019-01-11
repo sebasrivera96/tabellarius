@@ -12,7 +12,7 @@ import face_recognition
 import cv2
 import pyrebase
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 import json
 import sys
 import os
@@ -172,20 +172,92 @@ def getPathOfImgToLookOn(takeNewPic, pathOfImage):
         # Don't modify the pathOfImage
         return pathOfImage
 
-def getAllEncodingsOnImg(imgPath):
+def getAllEncodingsAndLocationsOnImg(imgPath):
+    mapLocation2EncodingOfFaces = {}
     imgObj = face_recognition.load_image_file(imgPath)
 
-    # -> Find the encoding(s) of the faces found on the image
-    listOfEncodings = face_recognition.face_encodings(imgObj)
+    # -> Find face locations on the imgObj
+    locationsOfFacesInImg = face_recognition.face_locations(imgObj)
 
-    return listOfEncodings
+    # -> Find the encodings of  found on the image
+    # listOfEncodings = face_recognition.face_encodings(imgObj)
+    for singleLocation in locationsOfFacesInImg:
+        mapLocation2EncodingOfFaces[singleLocation] = face_recognition.face_encodings(imgObj,known_face_locations=singleLocation)
 
-def printMatchingFaces(facesMatches):
-    if len(facesMatches) == 0:
+    return mapLocation2EncodingOfFaces
+
+def printMatchingFaces(facesMatched):
+    if len(facesMatched) == 0:
         print("No known faces found on this image {}.\n".format(defaultLocation[2:]))
     else:
-        for i in facesMatches:
+        for i in facesMatched:
             print("--> Face of {} found!\n".format(i))
+
+def createDrawAndImageObjects(pathToImg):
+    originalImage = face_recognition.load_image_file(pathToImg)
+
+    # Convert image to a PIL-format image so that we can draw on top of it
+    imagePIL = Image.fromarray(originalImage)
+
+    # Create Pillow ImageDraw Draw instance to draw with it
+    drawPIL = ImageDraw.Draw(imagePIL)
+
+    return imagePIL, drawPIL
+
+def drawBoundingBoxAndNameonImg(name, drawPIL, location):
+    top, right, bottom, left = location
+
+    # Draw a box around the face using the Pillow module
+    drawPIL.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
+
+    # Draw a label with a name below the face
+    text_width, text_height = drawPIL.textsize(name)
+    drawPIL.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
+    drawPIL.text((left + 6, bottom - text_height - 5), name, fill=(255, 255, 255, 255))
+
+def lookForKnownPeopleInImg(takeNewPic = True, pathOfImage = "", verbose = False):
+    """
+        Function Name:
+            lookForKnownPeople
+        Objective:
+            Take a pic & look for known people.
+        Input parameter(s):
+            - verbose : boolean to print or not information
+            - takeNewPic : boolean to take or no a new picture
+        Output parameter(s):
+            * None
+    """ 
+    facesMatched = []
+
+    # -> Take a new pic and save it in default location
+    pathOfImage = getPathOfImgToLookOn(takeNewPic, pathOfImage)
+
+    # -> Create Pil & Draw objects to mark the rectangles
+    imagePIL, drawPIL = createDrawAndImageObjects(pathOfImage)
+
+    # -> Get map location:enconding of each face on the image
+    mapLocation2EncodingOfFaces = getAllEncodingsAndLocationsOnImg(pathOfImage)
+
+    # -> Iterate over map and look for mathces
+    for tLocation, tEncoding in mapLocation2EncodingOfFaces.items():
+        matchingName = isUnknownAKnownFace(tEncoding)
+
+        # -> If match found, append it to the list of matches
+        if matchingName != None:
+            facesMatched.append(matchingName)
+            
+            # -> Draw a bounding box on the image
+            drawBoundingBoxAndNameonImg(matchingName, drawPIL, tLocation)
+    
+    # -> Print the matching names
+    if verbose:
+        printMatchingFaces(facesMatched)
+        imagePIL.show(title=pathOfImage)
+
+    # -> Remove the drawing library from memory as per the Pillow docs
+    del drawPIL
+
+    return facesMatched
 
 def lookForKnownPeopleInFiles(listOfFiles, directoryPath, verbose=False):
     foundImages = 0
@@ -206,40 +278,6 @@ def lookForKnownPeopleInFiles(listOfFiles, directoryPath, verbose=False):
             theDB.updateRuntimePaths(facesMatched, path=path2Img)
 
     return foundImages
-
-def lookForKnownPeopleInImg(takeNewPic = True, pathOfImage = "", verbose = False):
-    """
-        Function Name:
-            lookForKnownPeople
-        Objective:
-            Take a pic & look for known people.
-        Input parameter(s):
-            - verbose : boolean to print or not information
-            - takeNewPic : boolean to take or no a new picture
-        Output parameter(s):
-            * None
-    """ 
-    facesMatches = []
-
-    # -> Take a new pic and save it in default location
-    pathOfImage = getPathOfImgToLookOn(takeNewPic, pathOfImage)
-
-    # -> Get all encodings on the image
-    listOfEncodings = getAllEncodingsOnImg(pathOfImage)
-
-    # -> Iterate over listOfEncodings and look for mathces
-    for encoding in listOfEncodings:
-        tMatch = isUnknownAKnownFace(encoding)
-
-        # -> If match found, append it to the list of matches
-        if tMatch != None:
-            facesMatches.append(tMatch)
-    
-    # -> Print the matching names
-    if verbose:
-        printMatchingFaces(facesMatches)
-
-    return facesMatches
 
 def lookForKnownPeopleInDir(verbose = False):
     """
@@ -689,5 +727,15 @@ if __name__ == "__main__":
     # resizeImgsInDir(tFiles)
     # time.sleep(3)
     # deleteResizedImages(dir="/home/sebasrivera96/Desktop/FaceRevognitionTest_1")
+
+    # ===== Draw a bounding box and name on img =====
+    name = "Vicente Guerrero"
+
+    imgObj = face_recognition.load_image_file("temp.jpg")
+    pil_image, draw = createDrawAndImageObjects("temp.jpg")
+
+    location = face_recognition.face_locations(imgObj)[0]
+    drawBoundingBoxAndNameonImg(name, draw, location)
+    pil_image.show()
 
     pass
