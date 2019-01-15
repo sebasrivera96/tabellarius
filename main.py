@@ -26,8 +26,8 @@ def interactiveMenu():
     """
     global theDB
     option = ''
-    while option != 'e':
-        print("Please type a CHARACTER to execute an action: \n")
+    while option != 'exit':
+        print("\nPlease type a CHARACTER to execute an action: \n")
         # print("\t- [A] ==> Take a picture and display it")
         # print("\t- [B] ==> Register a new person")
         print("\t- [C] ==> Register people from a directory")
@@ -71,13 +71,17 @@ def interactiveMenu():
         elif option == 'G':
             lookForKnownPeopleInDir()
         elif option == 'H':
-            theDB.clearAllPathsToImgs()
+            if confirmAction(option):
+                theDB.clearAllPathsToImgs()
+            else:
+                print("\n ===== Operation {} was cancelled =====\n".format(option))
         elif option == 'I':
             if confirmAction(option):
                 theDB.removeAllPeople()
             else:
                 print("\n ===== Operation {} was cancelled =====\n".format(option))
         elif option == 'exit':
+            theDB.updatePaths()
             print("Exiting ...")
 
         else:
@@ -104,4 +108,4 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1:
         pass
 
-    theDB.updatePaths()
+    
