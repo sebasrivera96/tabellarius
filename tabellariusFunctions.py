@@ -106,8 +106,7 @@ def learnOnNewFace(imgPath, nameOfPerson):
     
     # -> If nameOfPerson already exists, exit func. returning 0
     if isNameRegistered(nameOfPerson):
-        print("\n ===== Face from {} already registered! ===== \n".format(nameOfPerson))
-        return -1
+        return 1
 
     # -> Create imgObj with face_recognition module
     imgObj = face_recognition.load_image_file(imgPath)
@@ -148,6 +147,7 @@ def areTheySameFace(encodingOne, encodingTwo):
         Input parameter(s): Both lists, which must be processed before comparing
             - encodingOne 
             - encodingTwo
+            - tolerance is a key parameter for success
         Output parameter(s):
             - Boolean 'True' if there is a match; else 'False'.
     """
@@ -156,7 +156,7 @@ def areTheySameFace(encodingOne, encodingTwo):
     encodingTwo = convertToNpArray(encodingTwo)
 
     # -> 1st param. must be a list of np.array and 2nd param must be a single np.array
-    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.55)
+    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.525)
     
     # 3) boolSameFace is a one-element list, thus return element 0
     return(boolSameFace[0])
@@ -353,9 +353,11 @@ def registerNewPerson(newName, takeNewPic = 'Y'):
 
     # 3) Print output status
     if successStatus == 0:
-        print("{} was successfuly added to the DB \n".format(newName))
-    elif successStatus != 0:
-        print("{} WAS NOT added due to an error :( \n".format(newName))
+        print("\n ====={} was successfuly added to the DB ===== \n".format(newName))
+    elif successStatus == -1:
+        print("\n ==== {} WAS NOT added. Zero or multiple faces found on img. ==== \n".format(newName))
+    elif successStatus == 1:
+        print("\n ===== Face from {} already registered! ===== \n".format(newName))
 
 # TODO Clean this function
 def registerPeopleFromDir():
