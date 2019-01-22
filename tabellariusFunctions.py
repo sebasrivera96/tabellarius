@@ -392,9 +392,11 @@ def registerPeopleFromDir():
 
             # 3) Print output status
             if successStatus == 0:
-                print("{} was successfuly added to the DB \n".format(newName))
-            elif successStatus != 0:
-                print("{} WAS NOT added due to an error :( \n".format(newName))
+                print("\n ====={} was successfuly added to the DB ===== \n".format(newName))
+            elif successStatus == -1:
+                print("\n ==== {} WAS NOT added. Zero or multiple faces found on img. ==== \n".format(newName))
+            elif successStatus == 1:
+                print("\n ===== Face from {} already registered! ===== \n".format(newName))
 
     # --> Delete resized duplicates    
     deleteResizedImages(directoryPath)

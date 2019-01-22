@@ -27,7 +27,8 @@ def interactiveMenu():
     global theDB
     option = ''
     while option != 'exit':
-        print("\nPlease type a CHARACTER to execute an action: \n")
+        print("\n************************************************")
+        print("Please type a CHARACTER to execute an action: \n")
         # print("\t- [A] ==> Take a picture and display it")
         # print("\t- [B] ==> Register a new person")
         print("\t- [C] ==> Register people from a directory")
@@ -38,6 +39,7 @@ def interactiveMenu():
         print("\t- [H] ==> Remove the paths to images of ALL the registered users")    
         print("\t- [I] ==> Remove ALL people registered")            
         print("\t- [exit] ==> Exit")
+        print("************************************************\n")
 
         option = input()
 
