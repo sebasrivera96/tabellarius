@@ -636,10 +636,14 @@ def resizeImgsInDir(filesInPath):
         Output parameter(s):
             * None
     """
-    # -> Execute the resizePic function on each img file of the list filesInPath
-    for currentFile in filesInPath:
-        if isFileAnImg(currentFile):
-            resizePic(originalImageName=currentFile, verbose=True)
+    try:
+        # -> Execute the resizePic function on each img file of the list filesInPath
+        for currentFile in filesInPath:
+            if isFileAnImg(currentFile):
+                resizePic(originalImageName=currentFile, verbose=True)
+    except:
+        print("Error while creating resized images")
+        deleteResizedImages()
 
 # ============================================================================ #
 

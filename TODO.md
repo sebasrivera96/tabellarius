@@ -6,3 +6,4 @@
 - [] README
     * Add instructions for looking for known people.
     * Instructions to erase information on the DB
+- [] Script to divide the pictures into different Directories.
