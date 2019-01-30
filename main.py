@@ -37,15 +37,18 @@ def interactiveMenu():
         print("\t- [F] ==> Erase a person given his/her name")        
         print("\t- [G] ==> Look for known people in pictures of a given directory") 
         print("\t- [H] ==> Remove the paths to images of ALL the registered users")    
-        print("\t- [I] ==> Remove ALL people registered")            
-        print("\t- [exit] ==> Exit")
+        print("\t- [I] ==> Remove ALL people registered")       
+        print("\t- [J] ==> Print the creation date of all images on a given directory")     
+        print("\t- [EXIT] ==> Finish the execution of tabellarius")
         print("************************************************\n")
 
-        option = input()
+        optionRaw = input()
+        optionUpper = optionRaw.upper()
 
-        if option == 'A':
+        if optionUpper == 'A':
             takePic(showImage=True)
-        elif option == 'B':
+
+        elif optionUpper == 'B':
             newName = input("Enter the complete name: ")
             
             newPic = ""
@@ -54,12 +57,14 @@ def interactiveMenu():
                 newPic = newPic.upper()
 
             registerNewPerson(newName, takeNewPic=newPic)
-        elif option == 'C':
+
+        elif optionUpper == 'C':
             registerPeopleFromDir()
-        elif option == 'D':
-            # printKnownPeople()
+
+        elif optionUpper == 'D':
             theDB.printRegisteredPeople()
-        elif option == 'E':
+
+        elif optionUpper == 'E':
             newPic = ""
             while newPic != 'Y' and newPic != 'N':
                 newPic = input("Take a new picture? [Y/N)]? ")
@@ -67,27 +72,35 @@ def interactiveMenu():
                 lookForKnownPeople(verbose=True, takeNewPic=True)
             elif newPic == 'N':
                 lookForKnownPeople(verbose=True, takeNewPic=False)
-        elif option == 'F':
+
+        elif optionUpper == 'F':
             eraseName = input("Enter the name to be erased: ")
             theDB.removePerson(eraseName)
-        elif option == 'G':
+
+        elif optionUpper == 'G':
             lookForKnownPeopleInDir()
-        elif option == 'H':
-            if confirmAction(option):
+
+        elif optionUpper == 'H':
+            if confirmAction(optionUpper):
                 theDB.clearAllPathsToImgs()
             else:
-                print("\n ===== Operation {} was cancelled =====\n".format(option))
-        elif option == 'I':
-            if confirmAction(option):
+                print("\n ===== Operation {} was cancelled =====\n".format(optionUpper))
+
+        elif optionUpper == 'I':
+            if confirmAction(optionUpper):
                 theDB.removeAllPeople()
             else:
-                print("\n ===== Operation {} was cancelled =====\n".format(option))
-        elif option == 'exit':
+                print("\n ===== Operation {} was cancelled =====\n".format(optionUpper))
+
+        elif optionUpper == 'J':
+            printCreationDateOfADirectory()
+
+        elif optionUpper == 'exit':
             theDB.updatePaths()
             print("Exiting ...")
 
         else:
-            print("The character [" + option + "] is not a valid option in this menu.")
+            print("The character [" + optionUpper + "] is not a valid option in this menu.")
 
 """
     TODO

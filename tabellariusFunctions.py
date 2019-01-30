@@ -17,6 +17,7 @@ import json
 import sys
 import os
 import time
+import exifread
 # ============================================================================ #
 
 # =========================== GLOBAL VARIABLES =============================== #
@@ -644,6 +645,39 @@ def resizeImgsInDir(filesInPath):
     except:
         print("Error while creating resized images")
         deleteResizedImages()
+
+# ============================================================================ #
+
+# ============================= EXIF FUNCTIONS ============================= #
+
+def printCreationDateOfADirectory():
+    # -> Ask for a path
+    directoryPath = askForDirPath()
+
+    # -> Retrieve elements in directoryPath as a list
+    filesInPath = getFilesFromDir(directoryPath)
+
+    # -> Loop through the images and print meta data only for images
+    for actualFile in filesInPath:
+        if isFileAnImg(actualFile):
+            completePathToImage = createPathToAFile(directoryPath, actualFile)
+            printCreationDateOfImage(completePathToImage)
+
+def printCreationDateOfImage(pathToImage):
+    # Open the image
+    imageFile = open(pathToImage, 'rb')
+
+    # Get meta data until DateTimeOriginal is found (retreived as dictionary)
+    exifTags = exifread.process_file(imageFile, stop_tag='DateTimeOriginal')
+
+    # Extract date from the tags, convert it to string
+    dateTimeOfImageFile = exifTags['EXIF DateTimeOriginal']
+    dateTimeOfImageFileAsStr = str(dateTimeOfImageFile)
+    dateOfImageFileAsStr = dateTimeOfImageFileAsStr
+
+    # Print the date
+    print("===== The image {} was created on {}. =====".format(pathToImage, dateOfImageFileAsStr))
+
 
 # ============================================================================ #
 
