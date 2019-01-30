@@ -67,6 +67,16 @@ Please type a CHARACTER to execute an action:
 
 ## Delete people & information
 
+Since the system is not 100% reliable, there will be some cases in which the user would like to delete the information created. For this reason, the interactive menu offers two options to delete this information.
+
+### Remove all people registered
+
+As the name suggests, this function will delete all the information in the Firebase Realtime Database. It is suggested to use this command only when the information was corrupted or a fatal error ocurred. If that is not the case, it is recommended to check the next function.
+
+### Delete the paths associated to all users
+
+This command will delete all the paths to images associated to the users. For instance, if the face recognition algorithm performed poorly on a set of images, the information stored will not be useful anymore. Therefore, it is recommended to remove the paths, tune the algorithm and rerun it on the dataset.
+
 ## Future development
 
 In the file called [TODO](./TODO.md), one can find the features that could be added to this system.
