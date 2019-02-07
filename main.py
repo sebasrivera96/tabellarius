@@ -26,14 +26,14 @@ def interactiveMenu():
     """
     global theDB
     option = ''
-    while option != 'exit':
+    while True:
         print("\n************************************************")
         print("Please type a CHARACTER to execute an action: \n")
-        # print("\t- [A] ==> Take a picture and display it")
-        # print("\t- [B] ==> Register a new person")
+        print("\t- [A] ==> Take a picture and display it")
+        print("\t- [B] ==> Register a new person")
         print("\t- [C] ==> Register people from a directory")
         print("\t- [D] ==> Print the registered people")
-        # print("\t- [E] ==> Take a picture and look for a known person")
+        print("\t- [E] ==> Take a picture and look for a known person")
         print("\t- [F] ==> Erase a person given his/her name")        
         print("\t- [G] ==> Look for known people in pictures of a given directory") 
         print("\t- [H] ==> Remove the paths to images of ALL the registered users")    
@@ -69,9 +69,9 @@ def interactiveMenu():
             while newPic != 'Y' and newPic != 'N':
                 newPic = input("Take a new picture? [Y/N)]? ")
             if newPic == 'Y':
-                lookForKnownPeople(verbose=True, takeNewPic=True)
+                lookForKnownPeopleInImg(takeNewPic = True, pathOfImage = "", verbose = True)
             elif newPic == 'N':
-                lookForKnownPeople(verbose=True, takeNewPic=False)
+                raise NotImplementedError
 
         elif optionUpper == 'F':
             eraseName = input("Enter the name to be erased: ")
@@ -95,9 +95,10 @@ def interactiveMenu():
         elif optionUpper == 'J':
             printCreationDateOfADirectory()
 
-        elif optionUpper == 'exit':
+        elif optionUpper == 'EXIT':
             theDB.updatePaths()
             print("Exiting ...")
+            break
 
         else:
             print("The character [" + optionUpper + "] is not a valid option in this menu.")

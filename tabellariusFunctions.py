@@ -17,7 +17,7 @@ import json
 import sys
 import os
 import time
-import exifread
+# import exifread
 # ============================================================================ #
 
 # =========================== GLOBAL VARIABLES =============================== #
@@ -25,12 +25,21 @@ knownPeople = {} # Dictionary: {key = Name, value = encoding}
 JSONPath = "/home/sebasrivera96/Documents/Dev/tabellarius/known_People.json"
 facesLoaded = 0 # int determines if knownPeople was modified (add/delete elems)
 defaultLocation = "/home/sebasrivera96/Pictures/Renombradas/Aaron_Hernandez_RESIZED.jpg"
-config = {  "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
-            "authDomain": "thefirstapp-80dcc.firebaseapp.com",
-            "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
-            "projectId": "thefirstapp-80dcc",
-            "storageBucket": "thefirstapp-80dcc.appspot.com",
-            "messagingSenderId": "601653648941"}
+configOld = {  
+    "apiKey": "AIzaSyB0jgw-XexiMlBeyFVwUQKUSaRAd5WbDvg",
+    "authDomain": "thefirstapp-80dcc.firebaseapp.com",
+    "databaseURL": "https://thefirstapp-80dcc.firebaseio.com",
+    "projectId": "thefirstapp-80dcc",
+    "storageBucket": "thefirstapp-80dcc.appspot.com",
+    "messagingSenderId": "601653648941"}
+    
+config = {
+    "apiKey": "AIzaSyBQk3eYfm1nPvYflVvlUMtf-3njJoAIDlQ",
+    "authDomain": "testtabellarius-c8614.firebaseapp.com",
+    "databaseURL": "https://testtabellarius-c8614.firebaseio.com",
+    "projectId": "testtabellarius-c8614",
+    "storageBucket": "testtabellarius-c8614.appspot.com",
+    "messagingSenderId": "41917739288"}
 # ============================================================================ #
 
 # ========================= FACE RECOGNITION FUNCTIONS ======================== #
@@ -171,7 +180,9 @@ def getPathOfImgToLookOn(takeNewPic, pathOfImage):
 
     else:
         # Don't modify the pathOfImage
-        return pathOfImage
+        pass
+    
+    return pathOfImage
 
 def getAllEncodingsAndLocationsOnImg(imgPath, verbose=False):
     mapLocation2EncodingOfFaces = {}
