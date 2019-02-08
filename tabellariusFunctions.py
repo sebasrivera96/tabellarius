@@ -166,14 +166,14 @@ def areTheySameFace(encodingOne, encodingTwo):
     encodingTwo = convertToNpArray(encodingTwo)
 
     # -> 1st param. must be a list of np.array and 2nd param must be a single np.array
-    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.525)
+    boolSameFace = face_recognition.compare_faces([encodingOne], encodingTwo, tolerance=0.6)
     
     # 3) boolSameFace is a one-element list, thus return element 0
     return(boolSameFace[0])
 
 def getPathOfImgToLookOn(takeNewPic, pathOfImage):
     if takeNewPic:
-        takePic(pathToSavePic=pathOfImage)
+        takePic(showImage=True)
         
         # Modify pathOfImg to the new captured image
         pathOfImage = "./temp.jpg"
@@ -231,7 +231,7 @@ def drawBoundingBoxAndNameonImg(name, drawPIL, location):
     drawPIL.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
     drawPIL.text((left + 6, bottom - text_height - 5), name, fill=(255, 255, 255, 255))
 
-def lookForKnownPeopleInImg(takeNewPic = True, pathOfImage = "", verbose = False):
+def lookForKnownPeopleInImg(takeNewPic = True, verbose = False, pathOfImage = "./temp.jpg"):
     """
         Function Name:
             lookForKnownPeople
@@ -568,7 +568,7 @@ if __name__ != "__main__":
 # ============================================================================ #
 
 # ============================= OPENCV FUNCTIONS ============================= #
-def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 0):
+def takePic(pathToSavePic = "./temp.jpg", showImage = False, deviceNum = 1):
     """
         TODO
         Function Name:
